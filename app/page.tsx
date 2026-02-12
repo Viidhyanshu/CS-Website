@@ -5,7 +5,7 @@ export default function Home() {
     <>
     
       <Skiper19 />
-      
+    <Footer/>
     </>
   );
 }
