@@ -22,10 +22,10 @@ export default function Navbar() {
 
   const navItems = [
     { name: "About", href: "/" },
-    { name: "Team", href: "/" },
-    { name: "Events", href: "/" },
-    { name: "Blog", href: "/" },
-    { name: "Contact", href: "/" }
+    { name: "Team", href: "/vfyg" },
+    { name: "Events", href: "/idk" },
+    { name: "Blog", href: "/what" },
+    { name: "Contact", href: "/lol" }
   ];
 
   return (
@@ -43,7 +43,7 @@ export default function Navbar() {
           onClick={() => setMenuOpen(!menuOpen)}
         >
           <span></span>
-          <span></span>
+          <span></span>. 
           <span></span>
         </div>
 
