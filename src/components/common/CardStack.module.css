@@ -109,3 +109,14 @@
     --translateY: 30vmin;
     z-index: 1;
 }
+
+.cards-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    transform-origin: center;
+
+    /* AUTO RESPONSIVE SCALE */
+    transform: scale(clamp(0.5, 1vw + 0.6, 1));
+}

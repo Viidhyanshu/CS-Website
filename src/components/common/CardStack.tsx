@@ -9,28 +9,34 @@ const images = [
   "/images/events/6.png",
   "/images/events/7.png",
 ];
+
 export default function CardStack() {
   return (
     <section className={styles.container}>
       <h1 className={styles.heading}>IEEE CS</h1>
 
-      <div className={styles.cards}>
-        {images.map((src, index) => (
-          <div key={index} className={styles.card}>
-            <img
-              src={src}
-              alt={`card-${index}`}
-              loading="eager"
-              decoding="async"
-              style={{ 
-                width: "100%", 
-                height: "100%", 
-                objectFit: "cover",
-                display: "block"
-              }}
-            />
-          </div>
-        ))}
-      </div>    </section>
+     
+      <div className={styles.cardsWrapper}>
+        <div className={styles.cards}>
+          {images.map((src, index) => (
+            <div key={index} className={styles.card}>
+              <img
+                src={src}
+                alt={`card-${index}`}
+                loading="eager"
+                decoding="async"
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "cover",
+                  display: "block"
+                }}
+              />
+            </div>
+          ))}
+        </div>
+      </div>
+
+    </section>
   );
 }
