@@ -18,14 +18,15 @@ export default function Home() {
     <div><Navbar/></div>
     
     <div><Skiper19 />
-    <CardStack/>
+    
     </div>
+    <CardStack/>
+    <HorizontalGallery/>
     <div style={{ height: "500px", position: "relative" }}>
-      <HorizontalGallery/>
+      
       <ImageHover/>
     </div>
      <Teamcard/>
-    
     <div style={{ position: "relative", zIndex: 100 }}>
       <Footer/>
     </div>
