@@ -1,9 +1,34 @@
 "use client";
+"use client";
 
-import TargetCursor from "@/src/components/ui/TargetCursor";
+import { useEffect, useState } from "react";
 
-export default function App() {
+export default function TargetCursor(props:any) {
+
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const hasTouchScreen =
+      "ontouchstart" in window || navigator.maxTouchPoints > 0;
+
+    const isSmallScreen = window.innerWidth <= 768;
+
+    const mobileRegex =
+      /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i;
+
+    const userAgent = navigator.userAgent;
+
+    setIsMobile(
+      hasTouchScreen || isSmallScreen || mobileRegex.test(userAgent)
+    );
+  }, []);
+
+  if (isMobile) return null; 
+
   return (
+    <div>
     <div>
       <TargetCursor 
         spinDuration={2}
@@ -16,5 +41,7 @@ export default function App() {
       <button className="cursor-target">Click me!</button>
       <div className="cursor-target">Hover target</div>
     </div>
+    </div>
   );
 }
+
