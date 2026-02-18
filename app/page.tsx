@@ -5,7 +5,7 @@ import Navbar from "@/src/components/common/Navbar";
 import Footer from "@/src/components/ui/Footer"
 import CardStack from "@/src/components/common/CardStack";
 import HorizontalGallery from "@/src/components/gallery/HorizontalGallery";
-import TargetCursor from "@/src/components/common/TargetCursor";
+import TargetCursor from "@/src/components/ui/TargetCursor";
 import TeamCard from "@/src/components/common/TeamCard";
 
 
@@ -14,18 +14,17 @@ export default function Home() {
     <>
 
     
-    <TargetCursor 
-        spinDuration={2}
-        hideDefaultCursor
-        parallaxOn
-  hoverDuration={0.2}
-/>
+    <TargetCursor/>
     <div><Navbar/></div>
-    <div>
-      <Skiper19 />
+    
+    <div><Skiper19 />
+    <CardStack/>
+    </div>
+    <div style={{ height: "500px", position: "relative" }}>
+      <HorizontalGallery/>
       <ImageHover/>
-      
-      <TeamCard
+    </div>
+     <TeamCard
         image="https://images.pexels.com/photos/34408249/pexels-photo-34408249.jpeg"
         name="John Doe"
         role="Lead Developer"
@@ -36,19 +35,7 @@ export default function Home() {
         }}
         className="w-[400px] h-[600px]"
       />
-      
-      <HorizontalGallery/>
-      <Footer/>
-    </div>
     
-    
-      
-    <div><Skiper19 />
-    <CardStack/>
-    </div>
-    <div style={{ height: "500px", position: "relative" }}>
-      <ImageHover/>
-    </div>
     <div style={{ position: "relative", zIndex: 100 }}>
       <Footer/>
     </div>
