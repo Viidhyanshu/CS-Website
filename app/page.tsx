@@ -6,7 +6,7 @@ import Footer from "@/src/components/ui/Footer"
 import CardStack from "@/src/components/common/CardStack";
 import HorizontalGallery from "@/src/components/gallery/HorizontalGallery";
 import TargetCursor from "@/src/components/ui/TargetCursor";
-import Teamcard from "@/src/components/common/Teamcard";
+import Idcard from "@/src/components/common/Idcard";
 
 
 export default function Home() {
@@ -26,7 +26,7 @@ export default function Home() {
       
       <ImageHover/>
     </div>
-     <Teamcard/>
+     <Idcard/>
     <div style={{ position: "relative", zIndex: 100 }}>
       <Footer/>
     </div>
