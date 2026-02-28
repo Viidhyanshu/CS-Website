@@ -2,30 +2,20 @@
 
 import React, { useEffect, useRef } from 'react';
 
-interface LightFXBackgroundProps {
-  primaryRayColor?: string;
-  secondaryRayColor?: string;
-  starColor?: string;
-  rayCount?: number;
-  starCount?: number;
-  rayOpacity?: number;
-  raySpeed?: number;
-  starBrightness?: number;
-  className?: string;
+interface Particle {
+  x: number;
+  y: number;
+  size: number;
+  opacity: number;
+  color: string;
+  vx: number;
+  vy: number;
 }
 
-const LightFXBackground: React.FC<LightFXBackgroundProps> = ({
-  primaryRayColor = 'rgb(255, 163, 0)',
-  secondaryRayColor = 'rgba(255, 163, 0, 0.5)',
-  starColor = 'rgb(255, 163, 0)',
-  rayCount = 3,
-  starCount = 150,
-  rayOpacity = 0.6,
-  raySpeed = 1,
-  starBrightness = 0.8,
-  className = '',
-}) => {
+export default function LightFXBackground() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const particlesRef = useRef<Particle[]>([]);
+  const animationFrameRef = useRef<number>();
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -35,157 +25,116 @@ const LightFXBackground: React.FC<LightFXBackgroundProps> = ({
     if (!ctx) return;
 
     // Set canvas size
-    const updateCanvasSize = () => {
+    const resizeCanvas = () => {
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
     };
-    updateCanvasSize();
-    window.addEventListener('resize', updateCanvasSize);
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
 
-    // Star particles
-    const stars: Star[] = [];
-    class Star {
-      x: number;
-      y: number;
-      size: number;
-      opacity: number;
-      twinkleSpeed: number;
-      baseOpacity: number;
+    // Initialize particles
+    const initializeParticles = () => {
+      const particles: Particle[] = [];
+      const particleCount = 150;
 
-      constructor() {
-        this.x = Math.random() * canvas!.width;
-        this.y = Math.random() * canvas!.height;
-        this.size = Math.random() * 1.5;
-        this.baseOpacity = Math.random() * starBrightness + 0.3;
-        this.opacity = this.baseOpacity;
-        this.twinkleSpeed = Math.random() * 0.01 + 0.005;
+      for (let i = 0; i < particleCount; i++) {
+        particles.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height,
+          size: Math.random() * 2 + 0.3,
+          opacity: Math.random() * 0.6 + 0.2,
+          color: Math.random() > 0.6 ? '#FFFFFF' : '#5DADE2',
+          vx: (Math.random() - 0.5) * 0.2,
+          vy: (Math.random() - 0.5) * 0.2,
+        });
       }
+      particlesRef.current = particles;
+    };
 
-      update() {
-        this.opacity += this.twinkleSpeed;
-        if (this.opacity >= this.baseOpacity || this.opacity <= this.baseOpacity * 0.3) {
-          this.twinkleSpeed *= -1;
-        }
-      }
+    initializeParticles();
 
-      draw(ctx: CanvasRenderingContext2D) {
-        ctx.fillStyle = `rgba(255, 163, 0, ${this.opacity})`;
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-        ctx.fill();
-      }
-    }
+    // Draw single angled ray from right side covering bottom
+    const drawRays = () => {
+      const rayStartX = canvas.width * 1.1;
+      const rayStartY = canvas.height * -0.3;
+      const rayEndX = canvas.width * -0.3;
+      const rayEndY = canvas.height * 1.1;
+      const rayWidth = 400;
 
-    // Initialize stars
-    for (let i = 0; i < starCount; i++) {
-      stars.push(new Star());
-    }
+      ctx.save();
+      ctx.globalCompositeOperation = 'lighter';
 
-    // Light rays
-    const rays: Ray[] = [];
-    class Ray {
-      angle: number;
-      speed: number;
-      opacity: number;
-      width: number;
-      maxLength: number;
-      currentLength: number;
+      // Create linear gradient for the angled ray
+      const gradient = ctx.createLinearGradient(rayStartX, rayStartY, rayEndX, rayEndY);
+      gradient.addColorStop(0, 'rgba(255, 207, 0, 0)');
+      gradient.addColorStop(0.3, 'rgba(255, 207, 0, 0.4)');
+      gradient.addColorStop(0.5, 'rgba(255, 207, 0, 0.5)');
+      gradient.addColorStop(0.7, 'rgba(255, 207, 0, 0.4)');
+      gradient.addColorStop(1, 'rgba(255, 207, 0, 0)');
 
-      constructor(index: number) {
-        this.angle = (Math.PI * 2 / rayCount) * index + (Math.random() - 0.5) * 0.5;
-        this.speed = raySpeed * (0.5 + Math.random() * 0.5);
-        this.opacity = 0;
-        this.width = 50 + Math.random() * 100;
-        this.maxLength = Math.sqrt(canvas.width ** 2 + canvas.height ** 2);
-        this.currentLength = this.maxLength * -0.5;
-      }
+      ctx.fillStyle = gradient;
+      ctx.beginPath();
+      const angle = Math.atan2(rayEndY - rayStartY, rayEndX - rayStartX);
+      const perpX = Math.cos(angle + Math.PI / 2) * (rayWidth / 2);
+      const perpY = Math.sin(angle + Math.PI / 2) * (rayWidth / 2);
 
-      update() {
-        this.currentLength += this.speed * 2;
-        if (this.currentLength > this.maxLength) {
-          this.currentLength = this.maxLength * -0.5;
-        }
+      ctx.moveTo(rayStartX + perpX, rayStartY + perpY);
+      ctx.lineTo(rayEndX + perpX, rayEndY + perpY);
+      ctx.lineTo(rayEndX - perpX, rayEndY - perpY);
+      ctx.lineTo(rayStartX - perpX, rayStartY - perpY);
+      ctx.closePath();
+      ctx.fill();
 
-        // Fade in and out
-        if (this.currentLength < 0) {
-          this.opacity = 0;
-        } else if (this.currentLength < this.maxLength * 0.2) {
-          this.opacity = (this.currentLength / (this.maxLength * 0.2)) * rayOpacity;
-        } else if (this.currentLength > this.maxLength * 0.7) {
-          this.opacity = ((this.maxLength - this.currentLength) / (this.maxLength * 0.3)) * rayOpacity;
-        } else {
-          this.opacity = rayOpacity;
-        }
-      }
-
-      draw(ctx: CanvasRenderingContext2D) {
-        if (this.opacity <= 0) return;
-
-        const startX = canvas!.width / 2;
-        const startY = canvas!.height / 2;
-
-        const endX = startX + Math.cos(this.angle) * this.currentLength;
-        const endY = startY + Math.sin(this.angle) * this.currentLength;
-
-        // Create gradient for ray
-        const gradient = ctx.createLinearGradient(startX, startY, endX, endY);
-        gradient.addColorStop(0, `rgba(255, 163, 0, 0)`);
-        gradient.addColorStop(0.5, `rgba(255, 163, 0, ${this.opacity})`);
-        gradient.addColorStop(1, `rgba(255, 163, 0, 0)`);
-
-        ctx.strokeStyle = gradient;
-        ctx.lineWidth = this.width;
-        ctx.lineCap = 'round';
-        ctx.lineJoin = 'round';
-        ctx.globalAlpha = this.opacity;
-        ctx.beginPath();
-        ctx.moveTo(startX, startY);
-        ctx.lineTo(endX, endY);
-        ctx.stroke();
-        ctx.globalAlpha = 1;
-      }
-    }
-
-    // Initialize rays
-    for (let i = 0; i < rayCount; i++) {
-      rays.push(new Ray(i));
-    }
+      ctx.restore();
+    };
 
     // Animation loop
     const animate = () => {
-      // Clear canvas with dark background
-      ctx.fillStyle = 'rgb(5, 5, 15)';
+      // Clear canvas with pure black
+      ctx.fillStyle = '#000000';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      // Update and draw stars
-      stars.forEach((star) => {
-        star.update();
-        star.draw(ctx);
+      // Draw rays
+      drawRays();
+
+      // Update and draw particles
+      particlesRef.current.forEach((particle) => {
+        particle.x += particle.vx;
+        particle.y += particle.vy;
+
+        // Wrap around edges
+        if (particle.x > canvas.width) particle.x = 0;
+        if (particle.x < 0) particle.x = canvas.width;
+        if (particle.y > canvas.height) particle.y = 0;
+        if (particle.y < 0) particle.y = canvas.height;
+
+        // Draw particle
+        ctx.fillStyle = particle.color;
+        ctx.globalAlpha = particle.opacity;
+        ctx.beginPath();
+        ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
+        ctx.fill();
       });
 
-      // Update and draw rays
-      rays.forEach((ray) => {
-        ray.update();
-        ray.draw(ctx);
-      });
-
-      requestAnimationFrame(animate);
+      ctx.globalAlpha = 1;
+      animationFrameRef.current = requestAnimationFrame(animate);
     };
 
     animate();
 
     return () => {
-      window.removeEventListener('resize', updateCanvasSize);
+      window.removeEventListener('resize', resizeCanvas);
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
+      }
     };
-  }, [rayCount, starCount, rayOpacity, raySpeed, starBrightness, primaryRayColor, secondaryRayColor, starColor]);
+  }, []);
 
   return (
     <canvas
       ref={canvasRef}
-      className={`fixed inset-0 -z-10 ${className}`}
-      style={{ width: '100%', height: '100%' }}
+      className="fixed inset-0 w-full h-full"
+      style={{ background: '#000000' }}
     />
   );
-};
-
-export default LightFXBackground;
+}
