@@ -1,6 +1,7 @@
 import {Skiper19} from "@/src/components/ui/stroke"
 import ImageHover from "@/src/components/common/ImageHover";
 import CardStack from "@/src/components/common/CardStack";
+import Gallery3D from "@/src/components/common/Gallery3D";
 import HorizontalGallery from "@/src/components/gallery/HorizontalGallery";
 import TargetCursor from "@/src/components/common/TargetCursor";
 import TeamCard from "@/src/components/common/TeamCard";
@@ -37,10 +38,15 @@ export default function Home() {
     </div>
     
     
-      
+     
     <div>
     <CardStack/>
     </div>
+
+   <section style={{ width: '100%', height: '600px' }}>
+  <Gallery3D title="IEEE CS" />
+</section>
+    
     </>
   );
 }
