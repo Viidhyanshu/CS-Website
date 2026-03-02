@@ -72,9 +72,11 @@ function GridCell({ index, scrollProgress }: CellProps) {
                     aspectRatio: '3/4',
                     zIndex: 10,
                     willChange: 'transform',
+                    backfaceVisibility: 'hidden',
+                    WebkitBackfaceVisibility: 'hidden',
                 }}
             >
-                <img src={IMAGES[index]} alt="" className="w-full h-full object-cover" loading="eager" />
+                <img src={IMAGES[index]} alt="" className="w-full h-full object-cover" loading="eager" style={{ filter: 'none', transform: 'translateZ(0)' }} />
             </motion.div>
         );
     }
@@ -92,9 +94,11 @@ function GridCell({ index, scrollProgress }: CellProps) {
                 borderRadius: 8,
                 aspectRatio: '3/4',
                 willChange: 'transform, opacity',
+                backfaceVisibility: 'hidden',
+                WebkitBackfaceVisibility: 'hidden',
             }}
         >
-            <img src={IMAGES[index]} alt="" className="w-full h-full object-cover" loading="lazy" />
+            <img src={IMAGES[index]} alt="" className="w-full h-full object-cover" loading="lazy" style={{ filter: 'none', transform: 'translateZ(0)' }} />
         </motion.div>
     );
 }
