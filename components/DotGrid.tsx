@@ -1,181 +1,290 @@
-"use client";
+'use client';
+import React, { useRef, useEffect, useCallback, useMemo } from 'react';
+import { gsap } from 'gsap';
+import { InertiaPlugin } from 'gsap/InertiaPlugin';
 
-import { useEffect, useRef } from "react";
+gsap.registerPlugin(InertiaPlugin);
 
-interface TopographicBackgroundProps {
-  className?: string;
-  lineColor?: string;
-  backgroundColor?: string;
-  lineCount?: number;
-  animated?: boolean;
+const throttle = (func: (...args: any[]) => void, limit: number) => {
+  let lastCall = 0;
+  return function (this: any, ...args: any[]) {
+    const now = performance.now();
+    if (now - lastCall >= limit) {
+      lastCall = now;
+      func.apply(this, args);
+    }
+  };
+};
+
+interface Dot {
+  cx: number;
+  cy: number;
+  xOffset: number;
+  yOffset: number;
+  _inertiaApplied: boolean;
 }
 
-export default function TopographicBackground({
-  className = "",
-  lineColor = "rgba(180, 140, 60, 0.75)",
-  backgroundColor = "#0d0d0d",
-  lineCount = 12,
-  animated = true,
-}: TopographicBackgroundProps) {
+export interface DotGridProps {
+  dotSize?: number;
+  gap?: number;
+  baseColor?: string;
+  activeColor?: string;
+  proximity?: number;
+  speedTrigger?: number;
+  shockRadius?: number;
+  shockStrength?: number;
+  maxSpeed?: number;
+  resistance?: number;
+  returnDuration?: number;
+  className?: string;
+  style?: React.CSSProperties;
+}
+
+function hexToRgb(hex: string) {
+  const m = hex.match(/^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i);
+  if (!m) return { r: 0, g: 0, b: 0 };
+  return {
+    r: parseInt(m[1], 16),
+    g: parseInt(m[2], 16),
+    b: parseInt(m[3], 16)
+  };
+}
+
+const DotGrid: React.FC<DotGridProps> = ({
+  dotSize = 16,
+  gap = 32,
+  baseColor = '#5227FF',
+  activeColor = '#5227FF',
+  proximity = 150,
+  speedTrigger = 100,
+  shockRadius = 250,
+  shockStrength = 5,
+  maxSpeed = 5000,
+  resistance = 750,
+  returnDuration = 1.5,
+  className = '',
+  style
+}) => {
+  const wrapperRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const animFrameRef = useRef<number>(0);
-  const timeRef = useRef<number>(0);
+  const dotsRef = useRef<Dot[]>([]);
+  const pointerRef = useRef({
+    x: 0,
+    y: 0,
+    vx: 0,
+    vy: 0,
+    speed: 0,
+    lastTime: 0,
+    lastX: 0,
+    lastY: 0
+  });
+
+  const baseRgb = useMemo(() => hexToRgb(baseColor), [baseColor]);
+  const activeRgb = useMemo(() => hexToRgb(activeColor), [activeColor]);
+
+  const circlePath = useMemo(() => {
+    if (typeof window === 'undefined' || !window.Path2D) return null;
+
+    const p = new Path2D();
+    p.arc(0, 0, dotSize / 2, 0, Math.PI * 2);
+    return p;
+  }, [dotSize]);
+
+  const buildGrid = useCallback(() => {
+    const wrap = wrapperRef.current;
+    const canvas = canvasRef.current;
+    if (!wrap || !canvas) return;
+
+    const { width, height } = wrap.getBoundingClientRect();
+    const dpr = window.devicePixelRatio || 1;
+
+    canvas.width = width * dpr;
+    canvas.height = height * dpr;
+    canvas.style.width = `${width}px`;
+    canvas.style.height = `${height}px`;
+    const ctx = canvas.getContext('2d');
+    if (ctx) ctx.scale(dpr, dpr);
+
+    const cols = Math.floor((width + gap) / (dotSize + gap));
+    const rows = Math.floor((height + gap) / (dotSize + gap));
+    const cell = dotSize + gap;
+
+    const gridW = cell * cols - gap;
+    const gridH = cell * rows - gap;
+
+    const extraX = width - gridW;
+    const extraY = height - gridH;
+
+    const startX = extraX / 2 + dotSize / 2;
+    const startY = extraY / 2 + dotSize / 2;
+
+    const dots: Dot[] = [];
+    for (let y = 0; y < rows; y++) {
+      for (let x = 0; x < cols; x++) {
+        const cx = startX + x * cell;
+        const cy = startY + y * cell;
+        dots.push({ cx, cy, xOffset: 0, yOffset: 0, _inertiaApplied: false });
+      }
+    }
+    dotsRef.current = dots;
+  }, [dotSize, gap]);
 
   useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
+    if (!circlePath) return;
 
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
+    let rafId: number;
+    const proxSq = proximity * proximity;
 
-    const resize = () => {
-      canvas.width = canvas.offsetWidth * window.devicePixelRatio;
-      canvas.height = canvas.offsetHeight * window.devicePixelRatio;
-      ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
-    };
+    const draw = () => {
+      const canvas = canvasRef.current;
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    resize();
-    window.addEventListener("resize", resize);
+      const { x: px, y: py } = pointerRef.current;
 
-    const noise = (x: number, y: number, t: number): number => {
-      return (
-        Math.sin(x * 0.8 + t * 0.12) * Math.cos(y * 0.6 + t * 0.09) * 0.4 +
-        Math.sin(x * 0.4 - y * 0.5 + t * 0.07) * 0.3 +
-        Math.cos(x * 1.1 + y * 0.9 - t * 0.11) * 0.2 +
-        Math.sin(x * 0.25 + y * 0.3 + t * 0.05) * 0.1
-      );
-    };
+      for (const dot of dotsRef.current) {
+        const ox = dot.cx + dot.xOffset;
+        const oy = dot.cy + dot.yOffset;
+        const dx = dot.cx - px;
+        const dy = dot.cy - py;
+        const dsq = dx * dx + dy * dy;
 
-    const W = () => canvas.offsetWidth;
-    const H = () => canvas.offsetHeight;
-
-    const drawContours = (t: number) => {
-      const w = W();
-      const h = H();
-
-      ctx.fillStyle = backgroundColor;
-      ctx.fillRect(0, 0, w, h);
-
-      ctx.strokeStyle = lineColor;
-      ctx.lineWidth = 0.9;
-      ctx.lineCap = "round";
-      ctx.lineJoin = "round";
-
-      const cols = 120;
-      const rows = 80;
-      const cellW = w / cols;
-      const cellH = h / rows;
-
-      const field: number[][] = [];
-      for (let j = 0; j <= rows; j++) {
-        field[j] = [];
-        for (let i = 0; i <= cols; i++) {
-          const nx = (i / cols) * 6;
-          const ny = (j / rows) * 4;
-          field[j][i] = noise(nx, ny, t);
-        }
-      }
-
-      const minV = -0.85;
-      const maxV = 0.85;
-
-      for (let c = 0; c < lineCount; c++) {
-        const threshold = minV + ((maxV - minV) * c) / (lineCount - 1);
-
-        ctx.beginPath();
-
-        for (let j = 0; j < rows; j++) {
-          for (let i = 0; i < cols; i++) {
-            const v00 = field[j][i];
-            const v10 = field[j][i + 1];
-            const v01 = field[j + 1][i];
-            const v11 = field[j + 1][i + 1];
-
-            const x0 = i * cellW;
-            const y0 = j * cellH;
-            const x1 = x0 + cellW;
-            const y1 = y0 + cellH;
-
-            const lerp = (a: number, b: number, va: number, vb: number) =>
-              a + ((b - a) * (threshold - va)) / (vb - va);
-
-            const idx =
-              (v00 > threshold ? 8 : 0) |
-              (v10 > threshold ? 4 : 0) |
-              (v11 > threshold ? 2 : 0) |
-              (v01 > threshold ? 1 : 0);
-
-            if (idx === 0 || idx === 15) continue;
-
-            const top = { x: lerp(x0, x1, v00, v10), y: y0 };
-            const right = { x: x1, y: lerp(y0, y1, v10, v11) };
-            const bottom = { x: lerp(x0, x1, v01, v11), y: y1 };
-            const left = { x: x0, y: lerp(y0, y1, v00, v01) };
-
-            const segments: Array<[{ x: number; y: number }, { x: number; y: number }]> = [];
-
-            switch (idx) {
-              case 1:  segments.push([bottom, left]); break;
-              case 2:  segments.push([right, bottom]); break;
-              case 3:  segments.push([right, left]); break;
-              case 4:  segments.push([top, right]); break;
-              case 5:  segments.push([top, left]); segments.push([right, bottom]); break;
-              case 6:  segments.push([top, bottom]); break;
-              case 7:  segments.push([top, left]); break;
-              case 8:  segments.push([left, top]); break;
-              case 9:  segments.push([bottom, top]); break;
-              case 10: segments.push([left, bottom]); segments.push([top, right]); break;
-              case 11: segments.push([right, top]); break;
-              case 12: segments.push([left, right]); break;
-              case 13: segments.push([bottom, right]); break;
-              case 14: segments.push([left, bottom]); break;
-            }
-
-            for (const [from, to] of segments) {
-              ctx.moveTo(from.x, from.y);
-              ctx.lineTo(to.x, to.y);
-            }
-          }
+        let style = baseColor;
+        if (dsq <= proxSq) {
+          const dist = Math.sqrt(dsq);
+          const t = 1 - dist / proximity;
+          const r = Math.round(baseRgb.r + (activeRgb.r - baseRgb.r) * t);
+          const g = Math.round(baseRgb.g + (activeRgb.g - baseRgb.g) * t);
+          const b = Math.round(baseRgb.b + (activeRgb.b - baseRgb.b) * t);
+          style = `rgb(${r},${g},${b})`;
         }
 
-        ctx.stroke();
-        ctx.beginPath();
+        ctx.save();
+        ctx.translate(ox, oy);
+        ctx.fillStyle = style;
+        ctx.fill(circlePath);
+        ctx.restore();
+      }
+
+      rafId = requestAnimationFrame(draw);
+    };
+
+    draw();
+    return () => cancelAnimationFrame(rafId);
+  }, [proximity, baseColor, activeRgb, baseRgb, circlePath]);
+
+  useEffect(() => {
+    buildGrid();
+    let ro: ResizeObserver | null = null;
+    if ('ResizeObserver' in window) {
+      ro = new ResizeObserver(buildGrid);
+      wrapperRef.current && ro.observe(wrapperRef.current);
+    } else {
+      (window as Window).addEventListener('resize', buildGrid);
+    }
+    return () => {
+      if (ro) ro.disconnect();
+      else window.removeEventListener('resize', buildGrid);
+    };
+  }, [buildGrid]);
+
+  useEffect(() => {
+    const onMove = (e: MouseEvent) => {
+      const now = performance.now();
+      const pr = pointerRef.current;
+      const dt = pr.lastTime ? now - pr.lastTime : 16;
+      const dx = e.clientX - pr.lastX;
+      const dy = e.clientY - pr.lastY;
+      let vx = (dx / dt) * 1000;
+      let vy = (dy / dt) * 1000;
+      let speed = Math.hypot(vx, vy);
+      if (speed > maxSpeed) {
+        const scale = maxSpeed / speed;
+        vx *= scale;
+        vy *= scale;
+        speed = maxSpeed;
+      }
+      pr.lastTime = now;
+      pr.lastX = e.clientX;
+      pr.lastY = e.clientY;
+      pr.vx = vx;
+      pr.vy = vy;
+      pr.speed = speed;
+
+      const rect = canvasRef.current!.getBoundingClientRect();
+      pr.x = e.clientX - rect.left;
+      pr.y = e.clientY - rect.top;
+
+      for (const dot of dotsRef.current) {
+        const dist = Math.hypot(dot.cx - pr.x, dot.cy - pr.y);
+        if (speed > speedTrigger && dist < proximity && !dot._inertiaApplied) {
+          dot._inertiaApplied = true;
+          gsap.killTweensOf(dot);
+          const pushX = dot.cx - pr.x + vx * 0.005;
+          const pushY = dot.cy - pr.y + vy * 0.005;
+          gsap.to(dot, {
+            inertia: { xOffset: pushX, yOffset: pushY, resistance },
+            onComplete: () => {
+              gsap.to(dot, {
+                xOffset: 0,
+                yOffset: 0,
+                duration: returnDuration,
+                ease: 'elastic.out(1,0.75)'
+              });
+              dot._inertiaApplied = false;
+            }
+          });
+        }
       }
     };
 
-    const animate = () => {
-      timeRef.current += animated ? 0.04 : 0;
-      drawContours(timeRef.current);
-      animFrameRef.current = requestAnimationFrame(animate);
+    const onClick = (e: MouseEvent) => {
+      const rect = canvasRef.current!.getBoundingClientRect();
+      const cx = e.clientX - rect.left;
+      const cy = e.clientY - rect.top;
+      for (const dot of dotsRef.current) {
+        const dist = Math.hypot(dot.cx - cx, dot.cy - cy);
+        if (dist < shockRadius && !dot._inertiaApplied) {
+          dot._inertiaApplied = true;
+          gsap.killTweensOf(dot);
+          const falloff = Math.max(0, 1 - dist / shockRadius);
+          const pushX = (dot.cx - cx) * shockStrength * falloff;
+          const pushY = (dot.cy - cy) * shockStrength * falloff;
+          gsap.to(dot, {
+            inertia: { xOffset: pushX, yOffset: pushY, resistance },
+            onComplete: () => {
+              gsap.to(dot, {
+                xOffset: 0,
+                yOffset: 0,
+                duration: returnDuration,
+                ease: 'elastic.out(1,0.75)'
+              });
+              dot._inertiaApplied = false;
+            }
+          });
+        }
+      }
     };
 
-    animate();
+    const throttledMove = throttle(onMove, 50);
+    window.addEventListener('mousemove', throttledMove, { passive: true });
+    window.addEventListener('click', onClick);
 
     return () => {
-      window.removeEventListener("resize", resize);
-      cancelAnimationFrame(animFrameRef.current);
+      window.removeEventListener('mousemove', throttledMove);
+      window.removeEventListener('click', onClick);
     };
-  }, [lineColor, backgroundColor, lineCount, animated]);
+  }, [maxSpeed, speedTrigger, proximity, resistance, returnDuration, shockRadius, shockStrength]);
 
   return (
-    <canvas
-      ref={canvasRef}
-      className={`block ${className}`}
-      style={{ background: backgroundColor, width: "100%", height: "100%", display: "block" }}
-    />
+    <section className={`p-4 flex items-center justify-center h-full w-full relative ${className}`} style={style}>
+      <div ref={wrapperRef} className="w-full h-full relative">
+        <canvas ref={canvasRef} className="absolute inset-0 w-full h-full pointer-events-none" />
+      </div>
+    </section>
   );
-}
+};
 
-
-export function TopographicDemo() {
-  return (
-    <div style={{ position: "fixed", inset: 0, width: "100vw", height: "100vh" }}>
-      <TopographicBackground
-        lineColor="rgba(180, 140, 60, 0.75)"
-        backgroundColor="#0d0d0d"
-        lineCount={14}
-        animated={true}
-      />
-    </div>
-  );
-}
+export default DotGrid;
