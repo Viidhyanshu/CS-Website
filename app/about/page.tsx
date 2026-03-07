@@ -30,34 +30,8 @@ export default function Home() {
         hoverDuration={0.2}
       />
       <div>
-       
-
-        <ScrollGrid />
-
-        {/* <TeamCard
-          image="https://images.pexels.com/photos/34408249/pexels-photo-34408249.jpeg"
-          name="John Doe"
-          role="Lead Developer"
-          socials={{
-            linkedin: "https://linkedin.com/in/johndoe",
-            twitter: "https://twitter.com/johndoe",
-            github: "https://github.com/johndoe"
-          }}
-          className="w-[min(400px,90vw)] h-[min(600px,120vw)]"
-        /> */}
-
-        
+        <Skiper19 />        
       </div>
-      <div>
-        <HorizontalGallery />
-      </div>
-      <div>
-        <CardStack />
-      </div>
-
-      <section style={{ width: '100%', height: '600px' }}>
-        <Gallery3D title="IEEE CS" />
-      </section>
     </>
   );
 }
