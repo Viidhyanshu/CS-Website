@@ -30,7 +30,7 @@ const ScrollControlled = ({
     direction === "left"
       ? useTransform(scrollYProgress, [0.7, 1], [-300, 0])
       : useTransform(scrollYProgress, [0.7, 1], [300, 0]);
-const smoothX = useSpring(x, {
+  const smoothX = useSpring(x, {
     stiffness: 90,
     damping: 25,
   });
@@ -59,18 +59,18 @@ const Skiper19 = () => {
         />
       </div>
 
-      <ScrollControlled direction = "left" className="rounded-4xl font-jakarta-sans w-[50vw] -translate-x-[15vw] translate-y-[100vh] ">
-        <img src="/ieee-cs-logo.png" alt="IEEE Logo" />
+      <ScrollControlled direction="left" className="rounded-4xl font-jakarta-sans w-[50vw] -translate-x-[15vw] translate-y-[100vh] ">
+        <img src="/logos/ieee-cs-logo.png" alt="IEEE Logo" />
       </ScrollControlled>
 
-      <ScrollControlled direction = "right"  className="rounded-4xl font-jakarta-sans w-[50vw] translate-x-[15vw] translate-y-[118vh] ">
+      <ScrollControlled direction="right" className="rounded-4xl font-jakarta-sans w-[50vw] translate-x-[15vw] translate-y-[118vh] ">
         <DecryptedText
           text="IEEE Computer Society"
           speed={100}
           maxIterations={15}
           className="text-[#efbf43] font-bold text-[40px] "
           encryptedClassName="text-[#efbf43] font-bold text-[40px] "
-          animateOn = 'both'
+          animateOn='both'
         />
         <p>
           “Serving computing at its best with inclusion and diversity” is the prime motto of the IEEE Computer Society. This society was created keeping in mind IEEE’s continued commitment to providing options at best. The IEEE Computer Society is driven by the central goals of equity, diversity, inclusion, and yearn to serve computing at its perfection.
@@ -83,14 +83,14 @@ const Skiper19 = () => {
         </p>
       </ScrollControlled>
 
-      <ScrollControlled direction = "left" className="rounded-4xl font-jakarta-sans w-[40vw] -translate-x-[5vw] translate-y-[140vh] ">
+      <ScrollControlled direction="left" className="rounded-4xl font-jakarta-sans w-[40vw] -translate-x-[5vw] translate-y-[140vh] ">
         <DecryptedText
           text="Words by the Chairperson"
           speed={100}
           maxIterations={15}
           className="text-[#efbf43] font-bold text-[40px] "
           encryptedClassName="text-[#efbf43] font-bold text-[40px] "
-          animateOn = 'both'
+          animateOn='both'
         />
         <p>
           <br />
@@ -105,7 +105,7 @@ const Skiper19 = () => {
           - Charirperson, IEEE CS MUJ
         </p>
       </ScrollControlled>
-      <ScrollControlled direction = "left" className="rounded-4xl font-jakarta-sans w-[40vw] -translate-x-[25vw] translate-y-[85vh] ">
+      <ScrollControlled direction="left" className="rounded-4xl font-jakarta-sans w-[40vw] -translate-x-[25vw] translate-y-[85vh] ">
         <TeamCard
           key="0"
           image="https://images.pexels.com/photos/34408249/pexels-photo-34408249.jpeg"
