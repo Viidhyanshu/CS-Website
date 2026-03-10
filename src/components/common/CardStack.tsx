@@ -14,26 +14,32 @@ const images = [
 
 export default function CardStack() {
   const [open, setOpen] = useState(false);
-  const containerRef = useRef<HTMLDivElement | null>(null);
+  const containerRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
+    let timer: NodeJS.Timeout;
+
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
-          setOpen(true);
+          timer = setTimeout(() => {
+            setOpen(true);
+          }, 500);
+
           observer.disconnect();
         }
       },
-      {
-        threshold: 0.7,
-      }
+      { threshold: 0.4 }
     );
 
     if (containerRef.current) {
       observer.observe(containerRef.current);
     }
 
-    return () => observer.disconnect();
+    return () => {
+      observer.disconnect();
+      if (timer) clearTimeout(timer);
+    };
   }, []);
 
   return (
