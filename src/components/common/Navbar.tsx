@@ -67,7 +67,7 @@ export default function Navbar() {
 
   const navItems = [
     { name: "Home", href: "/" },
-    { name: "About", href: "about" },
+    { name: "About", href: "/about" },
     { name: "Team", href: "/team" },
     { name: "Events", href: "/events" },
     { name: "Blogs", href: "https://medium.com/@ieeecs" },
