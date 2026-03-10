@@ -24,11 +24,13 @@ export default function SmoothScrollProvider({ children }: { children: React.Rea
       smoothWheel: true,
       wheelMultiplier: 0.8,
       touchMultiplier: 1.5,
+      // allow touch to be smooth properly
+      syncTouch: true,
     })
 
     lenisRef.current = lenis
 
-    // Connect Lenis scroll to GSAP ScrollTrigger so they stay in sync
+    // Proxy ScrollTrigger to use Lenis scroll position (keeps animations moving with scroll)
     lenis.on('scroll', ScrollTrigger.update)
 
     // Use GSAP ticker to drive Lenis instead of a raw rAF loop
@@ -41,13 +43,13 @@ export default function SmoothScrollProvider({ children }: { children: React.Rea
       gsap.ticker.remove(tickerFn)
       lenis.destroy()
       lenisRef.current = null
-      
+
       // Force remove any overflow locks manually that GSAP or Lenis might have left behind
       document.body.style.removeProperty('overflow')
       document.documentElement.style.removeProperty('overflow')
       document.body.style.removeProperty('height')
       document.documentElement.style.removeProperty('height')
-      
+
       // Kill all active scroll triggers to prevent them from interfering globally
       ScrollTrigger.getAll().forEach((t) => t.kill())
     }

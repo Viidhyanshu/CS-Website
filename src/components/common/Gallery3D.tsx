@@ -83,74 +83,97 @@ export default function Gallery3D({
     const scene = sceneRef.current;
     if (!scene) return;
 
-    const { width: cw, height: ch } = scene.getBoundingClientRect();
-    const cx = cw / 2;
-    const cy = ch / 2;
+    let rafId: number;
+    let cardStates: CardState[] = [];
 
-    const bw = cardWidth ?? Math.round(Math.min(cw * 0.32, 380));
-    const bh = Math.round(bw * cardAspect);
+    const initScene = () => {
+      // Clean up previous elements
+      for (const c of cardStates) c.el.remove();
+      cancelAnimationFrame(rafId);
 
-    const slots = buildSlots(cw, ch, bw, bh);
+      const { width: rawW, height: rawH } = scene.getBoundingClientRect();
+      const cw = rawW || window.innerWidth;
+      const ch = rawH || window.innerHeight;
+      const cx = cw / 2;
+      const cy = ch / 2;
 
-    const cardStates: CardState[] = slots.map(slot => {
-      const el = document.createElement('div');
-      el.className = styles.card;
-      el.style.width = `${bw}px`;
-      el.style.height = `${bh}px`;
-      el.style.willChange = 'transform, opacity';
-      el.style.contain = 'layout style paint';
+      const bw = cardWidth ?? Math.max(Math.round(Math.min(cw * 0.32, 380)), 150);
+      const bh = Math.max(Math.round(bw * cardAspect), 150);
 
-      const inner = document.createElement('div');
-      inner.className = styles.cardInner;
+      const slots = buildSlots(cw, ch, bw, bh);
 
-      const img = document.createElement('img');
-      img.src = slot.img;
-      img.draggable = false;
-      img.loading = 'eager';
-      img.decoding = 'async';
-      img.alt = '';
+      cardStates = slots.map(slot => {
+        const el = document.createElement('div');
+        el.className = styles.card;
+        el.style.width = `${bw}px`;
+        el.style.height = `${bh}px`;
+        el.style.willChange = 'transform, opacity';
+        el.style.contain = 'layout style paint';
 
-      inner.appendChild(img);
-      el.appendChild(inner);
-      scene.appendChild(el);
+        const inner = document.createElement('div');
+        inner.className = styles.cardInner;
 
-      return { el, slot, t: slot.t0 };
-    });
+        const img = document.createElement('img');
+        img.src = slot.img;
+        img.draggable = false;
+        img.loading = 'eager';
+        img.decoding = 'async';
+        img.alt = '';
 
-    let last: number | null = null;
+        inner.appendChild(img);
+        el.appendChild(inner);
+        scene.appendChild(el);
 
-    function tick(now: number) {
-      if (!last) last = now;
-      const dt = Math.min(now - last, 50);
-      last = now;
+        return { el, slot, t: slot.t0 };
+      });
 
-      for (const c of cardStates) {
-        c.t += c.slot.spd * dt;
-        if (c.t > 1) c.t -= 1;
+      let last: number | null = null;
 
-        const et = easeIn(c.t);
+      function tick(now: number) {
+        if (!last) last = now;
+        const dt = Math.min(now - last, 50);
+        last = now;
 
-        const px = cx + (c.slot.destX - cx) * et;
-        const py = cy + (c.slot.destY - cy) * et;
+        for (const c of cardStates) {
+          c.t += c.slot.spd * dt;
+          if (c.t > 1) c.t -= 1;
 
-        const scale = SCALE_FAR + (1 - SCALE_FAR) * et;
+          const et = easeIn(c.t);
 
-        let opacity: number;
-        if (c.t < 0.06) opacity = c.t / 0.06;
-        else if (c.t > 0.82) opacity = 1 - (c.t - 0.82) / 0.18;
-        else opacity = 1;
+          const px = cx + (c.slot.destX - cx) * et;
+          const py = cy + (c.slot.destY - cy) * et;
 
-        const left = px - bw / 2;
-        const top = py - bh / 2;
+          const scale = SCALE_FAR + (1 - SCALE_FAR) * et;
 
-        c.el.style.transform = `translate(${left}px, ${top}px) scale(${scale})`;
-        c.el.style.opacity = String(Math.max(0, opacity));
+          let opacity: number;
+          if (c.t < 0.05) opacity = c.t / 0.05;
+          else if (c.t > 0.85) opacity = 1 - (c.t - 0.85) / 0.15;
+          else opacity = 1;
+
+          const left = px - bw / 2;
+          const top = py - bh / 2;
+
+          c.el.style.transform = `translate3d(${left}px, ${top}px, 0) scale(${scale})`;
+          c.el.style.opacity = String(Math.max(0, opacity));
+          c.el.style.zIndex = String(Math.floor(scale * 100)); // Ensure larger items are in front
+        }
+
+        rafId = requestAnimationFrame(tick);
       }
 
-      rafRef.current = requestAnimationFrame(tick);
-    }
+      rafId = requestAnimationFrame(tick);
+      rafRef.current = rafId;
+    };
 
-    rafRef.current = requestAnimationFrame(tick);
+    initScene();
+
+    let resizeTimer: NodeJS.Timeout;
+    const handleResize = () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(initScene, 150);
+    };
+
+    window.addEventListener('resize', handleResize);
 
     function onMouseMove(e: MouseEvent) {
       const cur = cursorRef.current;
@@ -164,6 +187,8 @@ export default function Gallery3D({
 
     return () => {
       cancelAnimationFrame(rafRef.current);
+      clearTimeout(resizeTimer);
+      window.removeEventListener('resize', handleResize);
       scene.removeEventListener('mousemove', onMouseMove);
       for (const c of cardStates) c.el.remove();
     };

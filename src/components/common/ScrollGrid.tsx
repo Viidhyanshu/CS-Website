@@ -57,13 +57,17 @@ const GridCell = memo(function GridCell({
     const dx = col - heroCOL;
     const dy = row - heroROW;
     const dist = Math.max(Math.abs(dx), Math.abs(dy));
-    const delay = dist * 0.07;
 
-    const enterStart = 0.25 + delay;
-    const enterEnd = Math.min(enterStart + 0.35, 0.95);
+    // Reduce the delay scale to make elements appear faster in succession
+    const delay = dist * 0.03;
 
-    const heroScale = useTransform(scrollProgress, [0, 0.6], [2.5, 1]);
-    const heroBorderRadius = useTransform(scrollProgress, [0, 0.5], [12, 4]);
+    // Start earlier, end earlier, smaller gap
+    const enterStart = 0.10 + delay;
+    const enterEnd = Math.min(enterStart + 0.25, 0.95);
+
+    // Speed up hero transformation to match
+    const heroScale = useTransform(scrollProgress, [0, 0.3], [2.5, 1]);
+    const heroBorderRadius = useTransform(scrollProgress, [0, 0.3], [12, 4]);
 
     const siblingOpacity = useTransform(scrollProgress, [0, enterStart, enterEnd], [0, 0, 1]);
     const siblingY = useTransform(scrollProgress, [enterStart, enterEnd], [`${dy * 80 + 40}px`, '0px']);
@@ -160,7 +164,7 @@ export default function ScrollGrid() {
     const gridOpacity = useTransform(scrollYProgress, [0.85, 1], [1, 0]);
 
     return (
-        <div ref={containerRef} style={{ height: '350vh', position: 'relative' }}>
+        <div ref={containerRef} style={{ height: '200vh', position: 'relative' }}>
             <div
                 style={{
                     position: 'sticky',
