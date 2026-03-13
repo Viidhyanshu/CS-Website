@@ -55,7 +55,7 @@ export default function Gallery() {
         </div>
       </div>
     </SmoothScrollProvider>
-    <section className="relative z-50 block md:hidden overflow-hidden bg-transparent" style={{ width: '100%', height: '100vh', minHeight: '600px' }}>
+    <section className="relative z-50 block md:hidden overflow-hidden bg-transparent" style={{ width: '100%', height: 'auto', minHeight: '0' }}>
       <Gallery3D title="IEEE CS" />
     </section>
   </>
