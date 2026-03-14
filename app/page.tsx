@@ -9,6 +9,7 @@ const HorizontalGallery = dynamic(() => import("@/src/app/gallery/HorizontalGall
 const CardStack = dynamic(() => import("@/src/components/common/CardStack"), { ssr: false });
 const ProjectCard = dynamic(() => import("@/src/components/common/ProjectCard"), { ssr: false });
 const LandingText = dynamic(() => import("@/src/components/common/LandingText"), { ssr: false });
+const NewComponent = dynamic(() => import("@/src/components/common/newComponent"),{ ssr: false });
 
 import LineBackground from "@/components/LineBackground";
 import Newsletter from "@/components/Newsletter";
@@ -98,8 +99,12 @@ export default function Home() {
         <HorizontalGallery />
       </div>
       <div>
+        <NewComponent />
+      </div>
+      <div>
         <CardStack />
       </div>
+      
       <div>
         <ProjectCard />
       </div>
