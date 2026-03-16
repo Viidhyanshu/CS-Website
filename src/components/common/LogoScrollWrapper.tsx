@@ -47,7 +47,7 @@ export default function LogoScrollWrapper() {
                 trigger: "#about-scroll-canvas",
                 start: "top top",
                 end: "bottom bottom",   
-                scrub: 1.5,
+                scrub: 1.8,
                 invalidateOnRefresh: true,
             },
         });
