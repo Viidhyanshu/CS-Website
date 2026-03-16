@@ -20,6 +20,7 @@ export const metadata: Metadata = {
 };
 
 import Preloader from "@/src/components/common/Preloader";
+import { LoadingProvider } from "@/src/context/LoadingContext";
 
 export default function RootLayout({
   children,
@@ -32,12 +33,14 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased flex flex-col min-h-screen`}
         suppressHydrationWarning
       >
-        <Preloader />
-        <Navbar />
-        <main className="flex-grow">
-          {children}
-        </main>
-        <Footer />
+        <LoadingProvider>
+          <Preloader />
+          <Navbar />
+          <main className="flex-grow">
+            {children}
+          </main>
+          <Footer />
+        </LoadingProvider>
       </body>
     </html>
   );

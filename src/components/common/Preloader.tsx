@@ -3,33 +3,31 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
+import { useLoading } from "@/src/context/LoadingContext";
+
 export default function Preloader() {
-  const [loading, setLoading] = useState(true);
+  const { isReady, setVideoFinished } = useLoading();
 
   useEffect(() => {
-    // Lock scroll
-    document.body.style.overflow = "hidden";
-
-    // Fallback timer: if the video doesn't trigger onEnded for some reason
-    const timer = setTimeout(() => {
-      setLoading(false);
+    // Lock scroll while preloader is visible
+    if (!isReady) {
+      document.body.style.overflow = "hidden";
+    } else {
       document.body.style.overflow = "auto";
-    }, 5000); // 5 seconds fallback
+    }
 
     return () => {
-      clearTimeout(timer);
       document.body.style.overflow = "auto";
     };
-  }, []);
+  }, [isReady]);
 
   const handleVideoEnd = () => {
-    setLoading(false);
-    document.body.style.overflow = "auto";
+    setVideoFinished(true);
   };
 
   return (
     <AnimatePresence>
-      {loading && (
+      {!isReady && (
         <motion.div
           initial={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -41,7 +39,7 @@ export default function Preloader() {
             muted
             playsInline
             onEnded={handleVideoEnd}
-            className="w-full h-full object-cover"
+            className="w-full h-full object-contain md:object-cover"
           >
             <source src="/cs-microchip.mp4" type="video/mp4" />
             Your browser does not support the video tag.
