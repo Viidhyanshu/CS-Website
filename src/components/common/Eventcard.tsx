@@ -30,13 +30,17 @@ function EventCard({ exhibition }: EventCardProps) {
         />
 
         {/* Tag */}
-        <span className="absolute top-0 right-0 bg-[#9AC53F] text-black text-[11px] font-semibold tracking-widest px-3 py-1 uppercase">
+        <span 
+        style={{padding: "5px"}}
+        className="absolute top-0 right-0 bg-[#9AC53F] text-black text-[11px] rounded-bl-[7px] font-semibold tracking-widest uppercase">
           {exhibition.tag}
         </span>
       </div>
 
       {/* Content */}
-      <div className="flex flex-col flex-1 px-6 pt-6">
+      <div 
+      style={{padding: "15px 15px 0px 15px"}}
+      className="flex flex-col flex-1 px-6 pt-6">
         {/* Date */}
         <p className="text-[#9AC53F] text-xs font-semibold tracking-[0.18em] uppercase mb-2">
           {exhibition.date}
@@ -54,7 +58,9 @@ function EventCard({ exhibition }: EventCardProps) {
       </div>
 
       {/* Footer */}
-      <div className="flex items-center justify-between px-6 pb-6">
+      <div 
+      style={{padding: "0px 15px 15px 15px"}}
+      className="flex items-center justify-between px-6 pb-6">
 
 
         <a
@@ -100,7 +106,7 @@ export default function PastExhibitions() {
 
         {/* Grid */}
         {filtered.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 place-items-center w-full max-w-5xl mx-auto mt-[50px]">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 place-items-center w-full max-w-5xl mx-auto mt-[50px]">
             {filtered.map((ex) => (
               <EventCard key={ex.id} exhibition={ex} />
             ))}
