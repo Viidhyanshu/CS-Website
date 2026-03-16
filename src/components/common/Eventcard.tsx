@@ -58,8 +58,9 @@ function EventCard({ exhibition }: EventCardProps) {
 
 
         <a
-          href="#"
-          onClick={(e) => e.preventDefault()}
+          href={exhibition.linkImage}
+          target="_blank"
+          rel="noopener noreferrer"
           className="text-white text-sm font-medium border-b border-[#9AC53F] pb-1 flex items-center gap-2"
         >
           Learn more →

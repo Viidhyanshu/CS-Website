@@ -22,6 +22,7 @@ export default function Preloader() {
   }, [isReady]);
 
   const handleVideoEnd = () => {
+    sessionStorage.setItem("preloaderShown", "true");
     setVideoFinished(true);
   };
 
