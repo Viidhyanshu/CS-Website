@@ -52,7 +52,7 @@ export default function Event() {
 
       <section
         ref={section2Ref}
-        className="relative h-[100vh] flex items-center justify-center bg-black text-white relative z-20"
+        className="relative h-fit flex items-center justify-center bg-black text-white relative z-20"
       >
         <img
         src="/images/events/tear.svg"

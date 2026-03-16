@@ -28,9 +28,8 @@ function EventCard({ exhibition }: EventCardProps) {
           alt={exhibition.title}
           className="w-full h-full object-cover"
         />
-
         {/* Tag */}
-        <span className="absolute top-0 right-0 bg-[#9AC53F] text-black text-[11px] font-semibold tracking-widest px-3 py-1 uppercase">
+        <span className="absolute top-0 right-0 bg-[#F4A119] text-black text-[11px] font-semibold tracking-widest px-3 py-1 uppercase">
           {exhibition.tag}
         </span>
       </div>
@@ -38,7 +37,7 @@ function EventCard({ exhibition }: EventCardProps) {
       {/* Content */}
       <div className="flex flex-col flex-1 px-6 pt-6">
         {/* Date */}
-        <p className="text-[#9AC53F] text-xs font-semibold tracking-[0.18em] uppercase mb-2">
+        <p className="text-[#F4A119] text-xs font-semibold tracking-[0.18em] uppercase mb-2">
           {exhibition.date}
         </p>
 
@@ -57,13 +56,12 @@ function EventCard({ exhibition }: EventCardProps) {
       <div className="flex items-center justify-between px-6 pb-6">
 
 
-        <a
-          href="#"
-          onClick={(e) => e.preventDefault()}
-          className="text-white text-sm font-medium border-b border-[#9AC53F] pb-1 flex items-center gap-2"
+        <Link
+          href={`/events/${exhibition.id}`}
+          className="text-white text-sm font-medium border-b border-[#F4A119] pb-1 flex items-center gap-2"
         >
           Learn more →
-        </a>
+        </Link>
       </div>
     </article>
   );
@@ -75,32 +73,32 @@ export default function PastExhibitions() {
   return (
     <section className="relative bg-black min-h-screen font-sans overflow-hidden">
 
-      <div className="relative z-10 m-10 max-w-7xl justify-items-center mx-auto px-6 pt-4 pb-24 flex flex-col items-center gap-[25px]">
+      <div className="relative z-10 m-16 md:m-24 max-w-7xl justify-items-center mx-auto px-8 pt-8 pb-32 flex flex-col items-center gap-[40px]">
         {/* Header */}
 
-        <h1 className="text-6xl md:text-8xl font-extrabold text-white leading-tight tracking-tight text-center w-full mb-4"
-          style={{ textShadow: '0 0 20px rgba(250,204,21,0.3)' }}
+        <h1 className="text-6xl md:text-8xl lg:text-9xl font-extrabold text-white leading-tight tracking-tight text-center w-full mb-8"
+          style={{ textShadow: '0 0 30px rgba(244,161,25,0.2)' }}
         >
           Events
         </h1>
 
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-2 mb-20 w-full">
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 mb-24 w-full border-b border-zinc-800 pb-8">
 
-          <h2 className="text-5xl md:text-6xl font-bold text-white leading-tight">
-            View Past Events
+          <h2 className="text-5xl md:text-6xl font-bold text-white leading-tight uppercase tracking-tight">
+            Past Events
           </h2>
 
           <Link
             href="/events/calendar"
-            className="text-sm text-white-500 tracking-widest uppercase flex items-center gap-2"
+            className="text-sm text-[#F4A119] tracking-widest uppercase flex items-center gap-3 font-bold hover:gap-5 transition-all"
           >
-            View calendar
+            View calendar <span className="text-lg">→</span>
           </Link>
         </div>
 
         {/* Grid */}
         {filtered.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 place-items-center w-full max-w-5xl mx-auto mt-[50px]">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12 lg:gap-16 place-items-center w-full max-w-6xl mx-auto mt-12">
             {filtered.map((ex) => (
               <EventCard key={ex.id} exhibition={ex} />
             ))}
