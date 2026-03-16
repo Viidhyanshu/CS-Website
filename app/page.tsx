@@ -102,8 +102,24 @@ export default function Home() {
         <HorizontalGallery />
       </div>
       <div>
-        <CardStack />
+        <NewComponent />
       </div>
+      {/*CardStack pinned*/}
+      <div className="relative">
+        <div className="sticky top-0 z-0">
+          <CardStack />
+        </div>
+        <div className="relative z-10">
+          <StackingImage
+            src="/images/events/3.png"
+            alt="Events"
+            targetId="card-stack-section"
+          />
+        </div>
+      </div>
+
+
+      
       <div>
         <ProjectCard />
       </div>

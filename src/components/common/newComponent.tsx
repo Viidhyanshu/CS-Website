@@ -23,7 +23,7 @@ export default function NewComponent() {
           trigger: sectionRef.current,
           start: "top bottom",
           end: "bottom top",
-          scrub: 1.5, // smooth scroll follow
+          scrub: 1.5, 
         },
       }
     );
