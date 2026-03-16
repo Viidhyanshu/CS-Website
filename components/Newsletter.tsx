@@ -126,6 +126,34 @@ const StyledWrapper = styled.div`
     z-index: 10;
     backdrop-filter: blur(5px);
   }
+
+  /* ---------- Responsive ---------- */
+
+  @media (max-width: 1024px) {
+    .container .glass {
+      width: 220px;
+      height: 320px;
+      margin: 0 -60px;
+    }
+  }
+
+  /* Tablet */
+@media (max-width: 768px) {
+  .container .glass {
+    width: 180px;
+    height: 260px;
+    margin: 0 -45px;
+  }
+}
+
+/* Mobile */
+@media (max-width: 480px) {
+  .container .glass {
+    width: 140px;
+    height: 210px;
+    margin: 0 -35px;
+  }
+}
 `;
 
 export default Card;

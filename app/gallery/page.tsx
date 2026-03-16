@@ -34,7 +34,8 @@ export default function Gallery() {
         </div>
 
         <div className="relative z-10 w-full">
-          <div className="relative w-full h-screen">
+          {/* responsive hero height */}
+          <div className="relative w-full h-[70vh] sm:h-[85vh] md:h-screen">
             <video
               ref={videoRef}
               src="/images/gallery/IMG_2175.MOV"
@@ -48,13 +49,15 @@ export default function Gallery() {
                 transform: "scale(1.02)",
               }}
             />
+
             <div
-              className="absolute inset-0 flex items-center justify-center pointer-events-none"
+              className="absolute inset-0 flex items-center justify-center pointer-events-none px-4"
               style={{ backgroundColor: 'rgba(0, 0, 0, 0.3)' }}
             >
               <style>{`@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@1,700&display=swap');`}</style>
+
               <h1
-                className="text-[90px] md:text-[150px] leading-[1] text-white uppercase"
+                className="text-[48px] sm:text-[70px] md:text-[120px] lg:text-[150px] leading-[1] text-white uppercase text-center"
                 style={{
                   fontFamily: "'Cormorant Garamond', serif",
                   fontWeight: 700,
@@ -65,19 +68,27 @@ export default function Gallery() {
               >
                 Gallery
               </h1>
+
             </div>
           </div>
+
           <HorizontalGallery />
           <ScrollGrid />
+
           {/*<div className="hidden md:block">
             <ZoomGallery />
           </div>*/}
         </div>
       </div>
     </SmoothScrollProvider>
-    <section className="relative z-50 block md:hidden overflow-hidden bg-transparent" style={{ width: '100%', height: 'auto', minHeight: '0' }}>
+
+    <section
+      className="relative z-50 block md:hidden overflow-hidden bg-transparent"
+      style={{ width: '100%', height: 'auto', minHeight: '0' }}
+    >
       <Gallery3D title="IEEE CS" />
     </section>
+
   </>
   );
 }
