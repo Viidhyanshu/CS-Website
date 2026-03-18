@@ -260,7 +260,7 @@ export default function ScrollGrid() {
                     </div>
                 </motion.div>
             </div>
-            <br /><br /><br /><br /><br />
+            <br /><br />
         </div>
         
     );
