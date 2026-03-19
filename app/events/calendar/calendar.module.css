@@ -369,11 +369,11 @@
 @media (max-width: 768px) {
   .calendarContainer {
     border-radius: 16px;
-    margin: 0 8px;
+    margin: 0 12px;
   }
 
   .calendarGrid {
-    grid-template-columns: 65px 1fr;
+    grid-template-columns: 75px 1fr;
   }
 
   .calendarHeader {
@@ -399,16 +399,45 @@
   }
 
   .eventBar {
-    font-size: 0.75rem;
-    padding: 6px 12px;
+    font-size: 0.7rem;
+    padding: 5px 10px;
+    max-width: 100%;
   }
 
   .eventCard {
-    max-width: 200px;
+    max-width: 100%;
     padding: 10px 12px;
+  }
+
+  .eventImageWrapper {
+    width: 100%;
+    max-width: 240px;
+    height: 40px;
   }
 
   .sectionTitle {
     font-size: 1.4rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .calendarGrid {
+    grid-template-columns: 60px 1fr;
+  }
+  
+  .dayLabel {
+    padding: 10px 4px;
+  }
+  
+  .dayName {
+    font-size: 0.65rem;
+  }
+  
+  .monthTitle {
+    font-size: 1.1rem;
+  }
+  
+  .eventBar {
+    padding: 4px 8px;
   }
 }

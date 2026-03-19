@@ -71,12 +71,12 @@ export default function RollingSections() {
       
       <section
         ref={landingRef}
-        className="h-screen sticky top-0 flex items-center justify-between px-32 bg-[#1a1a1a] text-white z-10 relative"
+        className="h-screen sticky top-0 flex flex-col md:flex-row items-center justify-center md:justify-between px-6 md:px-32 bg-[#1a1a1a] text-white z-10 relative gap-12 md:gap-0"
       >
-        <div className="z-10 translate-x-30">
+        <div className="z-10 md:translate-x-30 text-center md:text-left order-1">
           <p
-            className="text-white font-bold text-3xl
-            [-webkit-text-stroke:2px_#facc15]
+            className="text-white font-bold text-xl md:text-3xl
+            [-webkit-text-stroke:1px_#facc15] md:[-webkit-text-stroke:2px_#facc15]
             [paint-order:stroke_fill]
             drop-shadow-[0_0_8px_rgba(250,204,21,0.7)]
             drop-shadow-[0_0_16px_rgba(250,204,21,0.5)]"
@@ -84,8 +84,8 @@ export default function RollingSections() {
             What&apos;s On
           </p>
           <h1
-            className="font-bold text-8xl
-            [-webkit-text-stroke:2px_#facc15]
+            className="font-bold text-5xl md:text-8xl
+            [-webkit-text-stroke:1px_#facc15] md:[-webkit-text-stroke:2px_#facc15]
             [paint-order:stroke_fill]
             drop-shadow-[0_0_8px_rgba(250,204,21,0.7)]
             drop-shadow-[0_0_16px_rgba(250,204,21,0.5)]"
@@ -94,15 +94,15 @@ export default function RollingSections() {
           </h1>
         </div>
 
-        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+        <div className="relative md:absolute md:left-1/2 md:top-1/2 md:-translate-x-1/2 md:-translate-y-1/2 opacity-100 pointer-events-auto z-0 order-2">
           <div className="logoWrapper relative flex items-center justify-center">
             <Image
               ref={logoRef}
               src="/logos/calendar-logo-center.png"
               alt="cal-logo"
-              width={350}
-              height={350}
-              className="object-contain relative z-10 mix-blend-screen"
+              width={250}
+              height={250}
+              className="object-contain relative z-10 mix-blend-screen md:w-[350px] md:h-[350px]"
             />
             <div className="sparkContainer">
               {Array.from({ length: 12 }).map((_, i) => (
@@ -112,10 +112,10 @@ export default function RollingSections() {
           </div>
         </div>
 
-        <div className="z-10 -translate-x-20">
+        <div className="z-10 md:-translate-x-20 text-center md:text-right order-3">
           <h1
-            className="font-bold text-8xl
-            [-webkit-text-stroke:2px_#facc15]
+            className="font-bold text-5xl md:text-8xl
+            [-webkit-text-stroke:1px_#facc15] md:[-webkit-text-stroke:2px_#facc15]
             [paint-order:stroke_fill]
             drop-shadow-[0_0_8px_rgba(250,204,21,0.7)]
             drop-shadow-[0_0_16px_rgba(250,204,21,0.5)]"

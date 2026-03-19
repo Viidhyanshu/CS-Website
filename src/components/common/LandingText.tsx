@@ -55,41 +55,41 @@ export default function ImpactText() {
               <Word className="text-[#F4A119] font-normal tracking-normal lowercase" style={{ fontFamily: "'Playfair Display', serif", fontVariant: 'small-caps' }}>
                 <span className="uppercase">REDEFINING</span>
               </Word>
-              <Word>LIMITS,</Word>
+              <Word>BOUNDARIES,</Word>
             </div>
 
             {/* Line 2 */}
             <div className="flex flex-wrap justify-center items-center gap-x-2 sm:gap-x-4 lg:gap-x-6 w-full mt-1 sm:mt-2 lg:mt-3">
-              <Word>FIGHTING</Word>
-              <Word>FOR</Word>
+              <Word>DRIVING</Word>
+              <Word>INNOVATION</Word>
               <Word className="text-[#F4A119] font-normal tracking-normal lowercase" style={{ fontFamily: "'Playfair Display', serif", fontVariant: 'small-caps' }}>
-                <span className="uppercase">WINS,</span>
+                <span className="uppercase">FORWARD.</span>
               </Word>
             </div>
 
             {/* Line 3 */}
             <div className="flex flex-wrap justify-center items-center gap-x-2 sm:gap-x-4 lg:gap-x-6 w-full mt-1 sm:mt-2 lg:mt-3">
-              <Word>BRINGING</Word>
-              <Word>IT</Word>
-              <Word>ALL</Word>
+              <Word>SHAPING</Word>
+              <Word>A</Word>
+              <Word>LEGACY</Word>
               <Word>IN</Word>
             </div>
 
             {/* Line 4 */}
             <div className="flex flex-wrap justify-center items-center gap-x-2 sm:gap-x-4 lg:gap-x-6 w-full mt-1 sm:mt-2 lg:mt-3">
-              <Word>ALL</Word>
-              <Word>WAYS.</Word>
-              <Word>DEFINING</Word>
-              <Word>A</Word>
+              <Word>TECHNOLOGY</Word>
+              <Word>WHERE</Word>
+              <Word>INNOVATION</Word>
+              <Word>EVOLVES</Word>
             </div>
 
             {/* Line 5 */}
             <div className="flex flex-wrap justify-center items-center gap-x-2 sm:gap-x-4 lg:gap-x-6 w-full mt-1 sm:mt-2 lg:mt-3">
               <Word className="text-[#F4A119] font-normal tracking-normal lowercase" style={{ fontFamily: "'Playfair Display', serif", fontVariant: 'small-caps' }}>
-                <span className="uppercase">LEGACY</span>
+                <span className="uppercase">INTO</span>
               </Word>
-              <Word>IN</Word>
-              <Word>FORMULA</Word>
+              <Word>LASTING</Word>
+              <Word>IMPACT.</Word>
               <Word>1</Word>
             </div>
 
