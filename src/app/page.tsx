@@ -13,6 +13,8 @@ const LandingText = dynamic(() => import("@/components/common/LandingText"), { s
 const HeroImageSequence = dynamic(() => import("@/components/common/HeroImageSequence"), { ssr: false });
 import SmoothScrollProvider from "@/components/common/SmoothScrollProvider";
 import { useLoading } from "@/context/LoadingContext";
+import { useGSAP } from "@gsap/react";
+import gsap from "gsap";
 const NewComponent = dynamic(() => import("@/components/common/newComponent"),{ ssr: false });
 import LineBackground from "@/components/LineBackground";
 import Newsletter from "@/components/Newsletter";
@@ -36,8 +38,9 @@ export default function Home() {
   const { isReady } = useLoading();
   const [startIntro, setStartIntro] = useState(false);
   const [showIntro, setShowIntro] = useState(true);
-  const [currentIndex, setCurrentIndex] = useState(0);
   const heroPinRef = useRef<HTMLDivElement>(null);
+  const introRef = useRef<HTMLDivElement>(null);
+  const textRef = useRef<HTMLSpanElement>(null);
 
   useEffect(() => {
     if (!isReady) return;
@@ -50,23 +53,79 @@ export default function Home() {
     return () => clearTimeout(delayTimer);
   }, [isReady]);
 
-  useEffect(() => {
-    if (!startIntro) return;
+  useGSAP(() => {
+    if (!startIntro || !introRef.current || !textRef.current) return;
 
-    const interval = setInterval(() => {
-      setCurrentIndex((i) =>
-        i >= HELLO_LANGUAGES.length - 1 ? i : i + 1
-      );
-    }, WORD_DURATION);
-    return () => clearInterval(interval);
-  }, [startIntro]);
+    const customEaseIn = "power4.in";
+    const customEaseOut = "power4.out";
 
-  useEffect(() => {
-    if (!startIntro) return;
+    const tl = gsap.timeline({
+      onComplete: () => {
+        // Cinematic lens focus fade-out: slight expansion, backdrop-blur fade-out, and opacity fade
+        gsap.to(introRef.current, {
+          opacity: 0,
+          scale: 1.03,
+          backdropFilter: "blur(0px)",
+          WebkitBackdropFilter: "blur(0px)",
+          duration: 0.65,
+          ease: "power3.inOut",
+          onComplete: () => {
+            setShowIntro(false);
+          }
+        });
+      }
+    });
 
-    const timer = setTimeout(() => setShowIntro(false), TOTAL_INTRO);
-    return () => clearTimeout(timer);
-  }, [startIntro]);
+    HELLO_LANGUAGES.forEach((lang, index) => {
+      if (index > 0) {
+        // Position subsequent languages at the bottom of the clipping mask with opacity 0 and blur
+        tl.set(textRef.current, { 
+          textContent: `• ${lang}`, 
+          y: 40, 
+          opacity: 0, 
+          filter: "blur(6px)" 
+        });
+
+        // Slide up + Fade in + Remove blur (snappy 0.3s duration)
+        tl.to(textRef.current, {
+          y: 0,
+          opacity: 1,
+          filter: "blur(0px)",
+          duration: 0.3,
+          ease: customEaseOut,
+        });
+      } else {
+        // Guarantee first language starts correctly positioned
+        tl.set(textRef.current, { 
+          y: 0, 
+          opacity: 1, 
+          filter: "blur(0px)" 
+        });
+      }
+
+      // Snappy word stay duration (0.2s stay time)
+      tl.to(textRef.current, {
+        duration: 0.2,
+      });
+
+      // Slide up + Fade out + Add blur (except for the last greeting, snappy 0.2s duration)
+      if (index < HELLO_LANGUAGES.length - 1) {
+        tl.to(textRef.current, {
+          y: -40,
+          opacity: 0,
+          filter: "blur(6px)",
+          duration: 0.2,
+          ease: customEaseIn,
+        });
+      } else {
+        // Let the last language stay slightly longer before overlay exit
+        tl.to(textRef.current, {
+          duration: 0.3,
+        });
+      }
+    });
+
+  }, { dependencies: [startIntro], scope: introRef });
 
   return (
     
@@ -108,39 +167,35 @@ export default function Home() {
         </div>
       </div>
       
-      <AnimatePresence mode="wait">
-        {showIntro ? (
-          <motion.div
-            key="intro"
-            className="fixed inset-0 z-50"
-            style={{ backgroundColor: "rgba(0, 0, 0, 0.8)" }}
-            initial={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
-          >
-            <div className="absolute inset-0 flex items-center justify-center">
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={currentIndex}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
-                  className="text-center"
-                  style={{
-                    fontFamily:
-                      "-apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, Arial, sans-serif",
-                  }}
-                >
-                  <span className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-light tracking-tight text-white">
-                    • {HELLO_LANGUAGES[currentIndex]}
-                  </span>
-                </motion.div>
-              </AnimatePresence>
-            </div>
-          </motion.div>
-        ) : null}
-      </AnimatePresence>
+      {showIntro ? (
+        <div
+          ref={introRef}
+          className="fixed inset-0 z-50 flex items-center justify-center"
+          style={{ 
+            willChange: "transform, opacity, filter",
+            backgroundColor: "rgba(0, 0, 0, 0.45)",
+            backdropFilter: "blur(20px)",
+            WebkitBackdropFilter: "blur(20px)",
+          }}
+        >
+          {/* Vertical mask viewport to clip sliding text */}
+          <div className="text-center overflow-hidden h-[120px] flex items-center justify-center">
+            <span
+              ref={textRef}
+              className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-light tracking-tight text-white block select-none"
+              style={{
+                fontFamily:
+                  "-apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, Arial, sans-serif",
+                willChange: "transform, opacity, filter",
+                opacity: 1,
+                transform: "translate3d(0, 0px, 0)",
+              }}
+            >
+              • नमस्ते
+            </span>
+          </div>
+        </div>
+      ) : null}
 
 
       {/* LandingText and subsequent content */}
