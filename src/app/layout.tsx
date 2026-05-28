@@ -36,6 +36,15 @@ const cormorant = Cormorant_Garamond({
 export const metadata: Metadata = {
   title: "ieee cs muj",
   description: "ieee cs muj website",
+  icons: {
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/logos/ieee-cs-logo.avif", type: "image/avif" },
+    ],
+    apple: [
+      { url: "/logos/ieee-cs-logo.avif", type: "image/avif" },
+    ],
+  },
 };
 
 import Preloader from "@/components/common/Preloader";
