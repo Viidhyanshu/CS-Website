@@ -5,10 +5,59 @@ import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 
 import AnimatedText from './AnimatedText'
-import Team3DLogo from './Team3DLogo'
-import { useLoading } from '@/context/LoadingContext'
+import ECCard from '@/app/team/ECCard'
+import { EC_MEMBERS } from '@/data/teamData'
 
 gsap.registerPlugin(ScrollTrigger)
+
+const TEAR_POINTS = [
+  [50.0, 0],
+  [49.2, 3.8],
+  [51.4, 7.1],
+  [48.6, 11.3],
+  [52.1, 15.0],
+  [47.8, 19.2],
+  [51.5, 23.0],
+  [48.2, 27.4],
+  [52.8, 31.1],
+  [47.4, 35.5],
+  [51.9, 39.2],
+  [48.0, 43.8],
+  [52.5, 47.5],
+  [47.6, 52.0],
+  [51.3, 56.3],
+  [48.8, 60.0],
+  [52.2, 64.5],
+  [47.3, 68.8],
+  [51.7, 72.5],
+  [48.4, 77.0],
+  [52.0, 81.3],
+  [47.9, 85.5],
+  [51.1, 90.0],
+  [48.7, 94.3],
+  [50.5, 97.8],
+  [50.0, 100],
+]
+
+// Build clip-path polygon for left half
+function buildLeftClip(): string {
+  const pts = [
+    '0% 0%',
+    ...TEAR_POINTS.map(([x, y]) => `${x}% ${y}%`),
+    '0% 100%',
+  ]
+  return `polygon(${pts.join(', ')})`
+}
+
+// Build clip-path polygon for right half  
+function buildRightClip(): string {
+  const pts = [
+    '100% 0%',
+    ...TEAR_POINTS.map(([x, y]) => `${x}% ${y}%`),
+    '100% 100%',
+  ]
+  return `polygon(${pts.join(', ')})`
+}
 
 // Newspaper collage images — dark, B&W grid of event photos
 const COLLAGE_PHOTOS = [
@@ -27,21 +76,24 @@ const HEADLINES = [
 ]
 
 export default function HeroSection() {
-  const { isReady } = useLoading()
   const contentRef = useRef<HTMLDivElement>(null)
-  const collageRef = useRef<HTMLDivElement>(null)
-  const mobileCollageWrapperRef = useRef<HTMLDivElement>(null)
+  const leftRef = useRef<HTMLDivElement>(null)
+  const rightRef = useRef<HTMLDivElement>(null)
   const ourStoryWrapper = useRef<HTMLDivElement>(null)
   const mobileContentRef = useRef<HTMLDivElement>(null)
   const mobileHeroRef = useRef<HTMLDivElement>(null)
   const heroRef = useRef<HTMLDivElement>(null)
 
 
-
+  // Pull HeroSection up to cover the sticky navbar
+  useLayoutEffect(() => {
+    const nav = document.querySelector('nav')
+    if (nav && heroRef.current) {
+      heroRef.current.style.marginTop = `-${nav.clientHeight}px`
+    }
+  }, [])
 
   useLayoutEffect(() => {
-    if (!isReady) return
-
     const ctx = gsap.context(() => {
       // ENTRANCE: content slides up
       gsap.from(contentRef.current, {
@@ -66,7 +118,7 @@ export default function HeroSection() {
           scrollTrigger: {
             trigger: ourStoryWrapper.current,
             start: 'top top',
-            end: '+=2000',
+            end: '+=1400',
             scrub: 0.5,
             pin: true,
             anticipatePin: 1,
@@ -83,77 +135,29 @@ export default function HeroSection() {
           immediateRender: false,
         })
 
-        // Step 2: wipe collage smoothly from left to right using circle clip-path
+        // Step 2: slide halves apart simultaneously
         tl.to(
-          collageRef.current,
-          {
-            clipPath: 'circle(120% at 220% 50%)',
-            ease: 'power2.inOut',
-            duration: 4.5,
-          },
-          '<+=0.3'
+          leftRef.current,
+          { x: '-100%', ease: 'power4.inOut', duration: 3.5 },
         )
-
-        // Step 3: zoom inner grid slightly for parallax cinematic depth
-        if (collageRef.current) {
-          tl.to(
-            collageRef.current.querySelector('.collage-grid-inner'),
-            {
-              scale: 1.06,
-              ease: 'power2.inOut',
-              duration: 4.5,
-            },
-            '<'
-          )
-        }
+        tl.to(rightRef.current, { x: '100%', ease: 'power4.inOut', duration: 3.5 }, '<')
       })
 
       // MOBILE/TABLET scroll animation
       mm.add('(max-width: 1024px)', () => {
-        const tl = gsap.timeline({
+        gsap.to([mobileHeroRef.current, mobileContentRef.current], {
+          y: -window.innerHeight * 1.3,
+          ease: 'power1.inOut',
           scrollTrigger: {
             trigger: ourStoryWrapper.current,
             start: 'top top',
-            end: '+=2500',
-            scrub: 0.5,
+            end: '+=1450',
+            scrub: 0.35,
             pin: true,
+            pinSpacing: true,
             anticipatePin: 1,
           },
         })
-
-        // Step 1: fade & blur mobile text
-        tl.to(mobileContentRef.current, {
-          opacity: 0,
-          filter: 'blur(8px)',
-          scale: 0.9,
-          duration: 2,
-          ease: 'power4.inOut',
-          immediateRender: false,
-        })
-
-        // Step 2: wipe mobile collage smoothly from left to right using circle clip-path
-        tl.to(
-          mobileCollageWrapperRef.current,
-          {
-            clipPath: 'circle(120% at 220% 50%)',
-            ease: 'power2.inOut',
-            duration: 4.5,
-          },
-          '<+=0.3'
-        )
-
-        // Step 3: zoom mobile inner grid slightly for parallax cinematic depth
-        if (mobileCollageWrapperRef.current) {
-          tl.to(
-            mobileCollageWrapperRef.current.querySelector('.collage-grid-inner'),
-            {
-              scale: 1.06,
-              ease: 'power2.inOut',
-              duration: 4.5,
-            },
-            '<'
-          )
-        }
       })
 
       // Delay refresh until after the browser has painted the new page DOM
@@ -184,67 +188,46 @@ export default function HeroSection() {
       })
 
       // Reset any inline styles left on elements
-      ;[contentRef, collageRef, mobileCollageWrapperRef, mobileContentRef, mobileHeroRef, heroRef].forEach((ref) => {
+      ;[contentRef, leftRef, rightRef, mobileContentRef, mobileHeroRef, heroRef].forEach((ref) => {
         if (ref.current) {
           ref.current.style.transform = ''
           ref.current.style.filter = ''
           ref.current.style.opacity = ''
-          ref.current.style.clipPath = ''
         }
       })
     }
-  }, [isReady])
+  }, [])
 
   return (
-    <div ref={heroRef} className="relative w-screen overflow-x-hidden text-white bg-transparent">
-      <div ref={ourStoryWrapper} className="relative min-h-[140vh] z-10 bg-transparent">
+    <div ref={heroRef} className="relative w-screen overflow-x-hidden text-white bg-black">
+      <div ref={ourStoryWrapper} className="relative min-h-[140vh] z-10 bg-black">
 
-        {/* Cinematic Bridge Backdrop (Revealed as Hero Collage Wipes Away) */}
+        {/* EC section */}
         <div
-          className="absolute top-0 left-0 w-full h-screen z-0 flex flex-col items-center justify-center bg-transparent"
+          className="absolute top-0 left-0 w-full h-full z-0"
+          style={{ background: '#080808' }}
         >
-          {/* Style to import fonts locally for the typography */}
-          <style>{`
-            @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Inter:wght@700;800;900&display=swap');
-          `}</style>
-          
-          <div 
-            className="relative z-10 flex flex-col items-center text-center px-6 max-w-5xl -translate-y-12 md:-translate-y-20 select-none"
+          <div
+            id="hero-ec-content"
+            style={{
+              width: '100%', minHeight: '100vh', height: 'auto',
+              display: 'flex', flexDirection: 'column',
+              alignItems: 'center', justifyContent: 'flex-start',
+              padding: '90px 4vw 180px', opacity: 1,
+            }}
           >
-            <div className="-mb-10 sm:-mb-14 md:-mb-20">
-              <Team3DLogo />
-            </div>
-            
-            <div className="flex items-center gap-x-2 text-[10px] sm:text-xs font-black uppercase tracking-[0.3em] px-3 py-1" style={{ fontFamily: "'Inter', sans-serif" }}>
-              <span className="text-white">IEEE</span>
-              <span className="text-[#EF9E00] font-normal tracking-normal lowercase" style={{ fontFamily: "'Playfair Display', serif", fontVariant: 'small-caps' }}>
-                <span className="uppercase">COMPUTER</span>
-              </span>
-              <span className="text-white">SOCIETY</span>
-            </div>
-            
-            <h2 
-              className="text-[1.8rem] sm:text-[3.2rem] md:text-[4.5rem] lg:text-[5.5rem] leading-[1.0] sm:leading-[0.95] lg:leading-[0.9] tracking-tight uppercase font-black flex flex-col items-center w-full mt-6"
-              style={{ fontFamily: "'Inter', sans-serif" }}
-            >
-              {/* Line 1: A Legacy of */}
-              <div className="flex flex-wrap justify-center items-center gap-x-2 sm:gap-x-4 lg:gap-x-5 w-fit mb-2">
-                <span className="text-white whitespace-nowrap">A</span>
-                <span className="text-[#EF9E00] font-normal tracking-normal lowercase whitespace-nowrap" style={{ fontFamily: "'Playfair Display', serif", fontVariant: 'small-caps' }}>
-                  <span className="uppercase">LEGACY</span>
-                </span>
-                <span className="text-white whitespace-nowrap">OF</span>
-              </div>
-
-              {/* Line 2: Innovation & Leadership */}
-              <div className="flex flex-wrap justify-center items-center gap-x-2 sm:gap-x-4 lg:gap-x-5 w-fit">
-                <span className="text-[#EF9E00] font-normal tracking-normal lowercase whitespace-nowrap" style={{ fontFamily: "'Playfair Display', serif", fontVariant: 'small-caps' }}>
-                  <span className="uppercase">INNOVATION</span>
-                </span>
-                <span className="text-white whitespace-nowrap">&</span>
-                <span className="text-white whitespace-nowrap">LEADERSHIP</span>
-              </div>
+            {/* Glow */}
+            <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', background: 'radial-gradient(ellipse 70% 50% at 50% 10%, rgba(239,158,0,0.12) 0%, transparent 70%)' }} />
+            {/* Title */}
+            <h2 style={{ position: 'relative', zIndex: 2, fontSize: 'clamp(2rem,5vw,3.2rem)', fontWeight: 900, color: '#fff', letterSpacing: '0.04em', marginBottom: '24px', textAlign: 'center', textShadow: '0 0 40px rgba(239,158,0,0.4)' }}>
+              Executive Committee
             </h2>
+            {/* Cards */}
+            <div className="relative z-10 grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 w-full max-w-[980px] justify-center">
+              {EC_MEMBERS.map((m, i) => (
+                <ECCard key={`${m.name}-${i}`} member={m} />
+              ))}
+            </div>
           </div>
         </div>
 
@@ -252,52 +235,57 @@ export default function HeroSection() {
         <div className="hidden lg:block">
           <div className="sticky top-0 z-20 h-screen overflow-hidden pointer-events-none">
 
-            {/* Desktop Unified Full-Screen Collage Canvas */}
+            {/* Left torn panel */}
             <div
-              ref={collageRef}
-              className="absolute pointer-events-auto"
+              ref={leftRef}
+              className="absolute top-0 left-0 h-screen z-30 will-change-transform pointer-events-auto"
               style={{
                 width: '100vw',
-                height: '100vh',
-                top: 0,
-                left: 0,
-                overflow: 'hidden',
-                clipPath: 'circle(120% at 50% 50%)',
-                willChange: 'clip-path',
-                zIndex: 30,
+                height: '104vh',
+                top: '-2vh',
+                clipPath: buildLeftClip(),
               }}
             >
-              <div className="collage-grid-inner w-full h-full">
-                <CollageGrid side="left" />
-              </div>
+              <CollageGrid side="left" />
+            </div>
+
+            {/* Right torn panel */}
+            <div
+              ref={rightRef}
+              className="absolute top-0 right-0 h-screen z-30 will-change-transform pointer-events-auto"
+              style={{
+                width: '100vw',
+                height: '104vh',
+                top: '-2vh',
+                clipPath: buildRightClip(),
+              }}
+            >
+              <CollageGrid side="right" />
             </div>
 
             {/* Centered text over panels */}
             <div className="absolute inset-0 flex items-center justify-center z-40 pointer-events-none">
               <div
                 ref={contentRef}
-                className="flex flex-col items-center text-center justify-center absolute inset-0 w-full"
+                className="flex flex-col items-center text-center justify-center absolute inset-0"
               >
                 <h1
-                  className="text-white font-black text-center w-full"
+                  className="text-white font-black"
                   style={{
                     fontSize: 'clamp(8rem, 14vw, 13rem)',
                     lineHeight: '1.0',
-                    fontFamily: 'Henju, serif',
                   }}
                 >
-                  <AnimatedText duration={2} className="text-center w-full">
+                  <AnimatedText duration={2}>
                     IEEE CS
                   </AnimatedText>
                 </h1>
                 <h2
-                  className="text-center w-full"
                   style={{
                     color: '#EF9E00',
                     fontSize: 'clamp(2rem, 3.5vw, 4rem)',
                     lineHeight: '1.0',
                     marginTop: '0.5rem',
-                    fontFamily: 'Henju, serif',
                   }}
                 >
                   Meet Our Team
@@ -314,34 +302,20 @@ export default function HeroSection() {
             ref={mobileHeroRef}
             className="sticky top-0 z-20 h-screen overflow-hidden pointer-events-none"
           >
-            {/* Mobile Unified Full-Screen Collage Canvas */}
-            <div
-              ref={mobileCollageWrapperRef}
-              className="absolute pointer-events-auto"
-              style={{
-                width: '100vw',
-                height: '100vh',
-                top: 0,
-                left: 0,
-                overflow: 'hidden',
-                clipPath: 'circle(120% at 50% 50%)',
-                willChange: 'clip-path',
-              }}
-            >
-              <div className="collage-grid-inner w-full h-full">
-                <CollageGrid side="left" />
-                <div className="absolute inset-0 bg-black/35 pointer-events-none" />
-              </div>
+            {/* Mobile collage background */}
+            <div className="absolute inset-0 pointer-events-auto">
+              <CollageGrid side="left" />
             </div>
+            <div className="absolute inset-0 bg-black/35 pointer-events-none" />
 
             <div className="absolute inset-0 flex items-center justify-center z-30">
               <div
                 ref={mobileContentRef}
-                className="flex flex-col items-center text-center w-full"
-                style={{ marginTop: '-10vh' }}
+                className="flex flex-col items-center text-center"
+                style={{ transform: 'translateY(-10vh)' }}
               >
                 <h1
-                  className="text-white text-center w-full"
+                  className="text-white"
                   style={{
                     fontSize: 'clamp(4rem, 15vw, 6rem)',
                     fontFamily: 'Henju, serif',
@@ -349,12 +323,11 @@ export default function HeroSection() {
                     lineHeight: '1.0',
                   }}
                 >
-                  <AnimatedText duration={2} className="text-center w-full">
+                  <AnimatedText duration={2}>
                     IEEE CS
                   </AnimatedText>
                 </h1>
                 <h2
-                  className="text-center w-full mx-auto"
                   style={{
                     color: '#EF9E00',
                     fontSize: 'clamp(1.2rem, 4.5vw, 2.2rem)',
@@ -371,8 +344,6 @@ export default function HeroSection() {
             </div>
           </div>
         </div>
-
-
 
       </div>
     </div>
