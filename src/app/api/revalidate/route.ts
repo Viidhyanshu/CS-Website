@@ -1,4 +1,4 @@
-import { revalidateTag } from 'next/cache';
+import { revalidatePath } from 'next/cache';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(request: NextRequest) {
@@ -12,7 +12,9 @@ export async function POST(request: NextRequest) {
   const body = await request.json().catch(() => ({}));
   const tag: string = body.tag ?? 'team';
 
-  revalidateTag(tag);
+  if (tag === 'team') {
+    revalidatePath('/team', 'page');
+  }
 
   return NextResponse.json({ revalidated: true, tag });
 }

@@ -29,5 +29,5 @@ export const getTeamMembers = unstable_cache(
     };
   },
   ['team-members'],
-  { tags: ['team'], revalidate: false }
+  { revalidate: false }
 );
