@@ -6,7 +6,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger'
 
 import AnimatedText from './AnimatedText'
 import ECCard from '@/app/team/ECCard'
-import { EC_MEMBERS } from '@/data/teamData'
+import type { TeamMember } from '@/data/teamData'
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -75,7 +75,7 @@ const HEADLINES = [
   ""
 ]
 
-export default function HeroSection() {
+export default function HeroSection({ ecMembers }: { ecMembers: TeamMember[] }) {
   const contentRef = useRef<HTMLDivElement>(null)
   const leftRef = useRef<HTMLDivElement>(null)
   const rightRef = useRef<HTMLDivElement>(null)
@@ -224,7 +224,7 @@ export default function HeroSection() {
             </h2>
             {/* Cards */}
             <div className="relative z-10 grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 w-full max-w-[980px] justify-center">
-              {EC_MEMBERS.map((m, i) => (
+              {ecMembers.map((m, i) => (
                 <ECCard key={`${m.name}-${i}`} member={m} />
               ))}
             </div>

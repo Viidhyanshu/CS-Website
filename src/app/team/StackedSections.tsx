@@ -7,7 +7,7 @@ gsap.registerPlugin(ScrollTrigger);
 
 import MemberCard from "./MemberCard";
 
-import { WEB_MEMBERS, CORE_MEMBERS, TeamMember } from '@/data/teamData';
+import { TeamMember } from '@/data/teamData';
 
 
 
@@ -51,7 +51,7 @@ function StickyPanel({ title, members, bg, zIndex, panelRef, gradient }: PanelPr
 }
 
 /* ── Main ─────────────────────────────────────────────────── */
-export default function StackedSections() {
+export default function StackedSections({ webMembers, coreMembers }: { webMembers: TeamMember[]; coreMembers: TeamMember[] }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const panel1Ref    = useRef<HTMLDivElement>(null);
   const panel2Ref    = useRef<HTMLDivElement>(null);
@@ -93,8 +93,8 @@ export default function StackedSections() {
 
   return (
     <div ref={containerRef} style={{ position: "relative" }}>
-      <StickyPanel panelRef={panel1Ref} title="Website Team" members={WEB_MEMBERS} bg="#0a0a0a" gradient="radial-gradient(ellipse 60% 40% at 50% 0%, rgba(56,189,248,0.07) 0%, transparent 70%)" zIndex={1} />
-      <StickyPanel panelRef={panel2Ref} title="Core Committee" members={CORE_MEMBERS} bg="#1a1a1a" gradient="radial-gradient(ellipse 60% 40% at 50% 0%, rgba(192,132,252,0.07) 0%, transparent 70%)" zIndex={2} />
+      <StickyPanel panelRef={panel1Ref} title="Website Team" members={webMembers} bg="#0a0a0a" gradient="radial-gradient(ellipse 60% 40% at 50% 0%, rgba(56,189,248,0.07) 0%, transparent 70%)" zIndex={1} />
+      <StickyPanel panelRef={panel2Ref} title="Core Committee" members={coreMembers} bg="#1a1a1a" gradient="radial-gradient(ellipse 60% 40% at 50% 0%, rgba(192,132,252,0.07) 0%, transparent 70%)" zIndex={2} />
     </div>
   );
 }
