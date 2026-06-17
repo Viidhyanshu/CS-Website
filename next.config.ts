@@ -15,6 +15,10 @@ const nextConfig: NextConfig = {
         protocol: 'https',
         hostname: 'images.prismic.io',
       },
+      {
+        protocol: 'https',
+        hostname: 'pub-2b91df05320148438318902a8dc7795b.r2.dev',
+      },
     ],
   },
 };
