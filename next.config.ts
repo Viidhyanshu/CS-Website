@@ -2,6 +2,7 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   images: {
+    unoptimized: true, // R2 images are pre-optimized AVIFs, skip Next.js optimization
     remotePatterns: [
       {
         protocol: 'https',
