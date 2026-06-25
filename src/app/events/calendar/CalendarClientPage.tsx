@@ -85,11 +85,6 @@ export default function CalendarClientPage({ events }: CalendarClientPageProps) 
     });
   };
 
-  const getEventDay = (dateStr: string) => {
-    const d = new Date(dateStr);
-    return isNaN(d.getTime()) ? "" : d.toLocaleDateString('en-US', { day: 'numeric' });
-  };
-
   return (
     <SmoothScrollProvider>
       <div>
@@ -104,6 +99,7 @@ export default function CalendarClientPage({ events }: CalendarClientPageProps) 
               [paint-order:stroke_fill]
               drop-shadow-[0_0_8px_rgba(250,204,21,0.7)]
               drop-shadow-[0_0_16px_rgba(250,204,21,0.5)]"
+              style={{ fontFamily: "'Playfair Display', serif" }}
             >
               What&apos;s On
             </p>
@@ -113,6 +109,7 @@ export default function CalendarClientPage({ events }: CalendarClientPageProps) 
               [paint-order:stroke_fill]
               drop-shadow-[0_0_8px_rgba(250,204,21,0.7)]
               drop-shadow-[0_0_16px_rgba(250,204,21,0.5)]"
+              style={{ fontFamily: "'Playfair Display', serif" }}
             >
               Events
             </h1>
@@ -143,6 +140,7 @@ export default function CalendarClientPage({ events }: CalendarClientPageProps) 
               [paint-order:stroke_fill]
               drop-shadow-[0_0_8px_rgba(250,204,21,0.7)]
               drop-shadow-[0_0_16px_rgba(250,204,21,0.5)]"
+              style={{ fontFamily: "'Playfair Display', serif" }}
             >
               Calendar
             </h1>
@@ -156,19 +154,56 @@ export default function CalendarClientPage({ events }: CalendarClientPageProps) 
         </section>
 
         <section className={styles.calendarSection}>
-          <h2 className={styles.sectionTitle}>Events</h2>
+          <h2
+            style={{
+              textAlign: "center",
+              fontFamily: "'Playfair Display', serif",
+              fontWeight: 900,
+              background: "linear-gradient(to right, #ffffff, #f9ba1f)",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+              fontSize: "clamp(2.75rem, 8vw, 5.25rem)",
+              lineHeight: 1.15,
+              paddingBottom: "0.15em",
+              letterSpacing: "-0.03em",
+              marginBottom: "0px",
+              marginTop: "40px",
+            }}
+          >
+            Events
+          </h2>
+          <div
+            style={{
+              width: "32px",
+              height: "3px",
+              backgroundColor: "#ffffff",
+              boxShadow: "0 0 8px rgba(255, 255, 255, 0.8), 0 0 15px rgba(255, 255, 255, 0.5)",
+              marginTop: "10px",
+              marginBottom: "2rem",
+              marginLeft: "auto",
+              marginRight: "auto",
+              borderRadius: "999px",
+            }}
+          />
 
           <div className={styles.calendarContainer}>
             <div className={styles.calendarHeader}>
               <div className={styles.headerLeft}>
                 <div className="relative mr-4" ref={yearDropdownRef}>
-                  <button
+                   <button
                     onClick={() => setIsYearDropdownOpen(!isYearDropdownOpen)}
-                    className="flex items-center gap-2 px-4 py-2 bg-white/5 hover:bg-white/10 active:bg-white/15 border border-white/10 rounded-xl text-xl sm:text-2xl font-bold text-[#f9ba1f] transition-all duration-200 shadow-lg cursor-pointer"
+                    className="flex items-center gap-2 bg-white/5 hover:bg-white/10 active:bg-white/15 border border-white/10 rounded-xl text-base sm:text-lg font-bold text-white transition-all duration-200 shadow-lg cursor-pointer"
+                    style={{
+                      paddingTop: "10px",
+                      paddingBottom: "10px",
+                      paddingLeft: "18px",
+                      paddingRight: "18px",
+                      lineHeight: 1,
+                    }}
                   >
                     <span>{selectedYear}</span>
                     <svg
-                      className={`w-5 h-5 transition-transform duration-200 ${isYearDropdownOpen ? 'rotate-180' : ''}`}
+                      className={`w-4 h-4 transition-transform duration-200 ${isYearDropdownOpen ? 'rotate-180' : ''}`}
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -179,7 +214,7 @@ export default function CalendarClientPage({ events }: CalendarClientPageProps) 
                   </button>
                   
                   {isYearDropdownOpen && (
-                    <div className="absolute left-0 mt-2 w-36 bg-[#1a1a2e]/95 backdrop-blur-md border border-white/10 rounded-xl shadow-2xl z-50 py-1.5 overflow-hidden transition-all duration-150 ease-out origin-top">
+                    <div className="absolute left-0 mt-2 w-full min-w-[100px] bg-[#0b0b0b]/95 backdrop-blur-md border border-white/10 rounded-xl shadow-2xl z-50 py-1.5 overflow-hidden transition-all duration-150 ease-out origin-top">
                       {yearsToShow.map((yr) => (
                         <button
                           key={yr}
@@ -187,11 +222,17 @@ export default function CalendarClientPage({ events }: CalendarClientPageProps) 
                             setSelectedYear(yr);
                             setIsYearDropdownOpen(false);
                           }}
-                          className={`w-full text-left px-4 py-2.5 text-base sm:text-lg font-semibold transition-colors cursor-pointer block ${
+                          className={`w-full text-left font-semibold transition-colors cursor-pointer block ${
                             selectedYear === yr
                               ? "text-[#f9ba1f] bg-white/5"
                               : "text-white/70 hover:text-white hover:bg-white/5"
                           }`}
+                          style={{
+                            paddingLeft: "18px",
+                            paddingRight: "18px",
+                            paddingTop: "8px",
+                            paddingBottom: "8px",
+                          }}
                         >
                           {yr}
                         </button>
@@ -199,7 +240,16 @@ export default function CalendarClientPage({ events }: CalendarClientPageProps) 
                     </div>
                   )}
                 </div>
-                <span className={styles.yearBadge}>
+                <span
+                  className="inline-flex items-center bg-white/15 border border-white/10 rounded-xl text-base sm:text-lg font-semibold text-white"
+                  style={{
+                    paddingTop: "10px",
+                    paddingBottom: "10px",
+                    paddingLeft: "18px",
+                    paddingRight: "18px",
+                    lineHeight: 1,
+                  }}
+                >
                   Yearly Calendar
                 </span>
               </div>
@@ -227,7 +277,6 @@ export default function CalendarClientPage({ events }: CalendarClientPageProps) 
                       )}
 
                       {monthEvents.map((ev: EventItem, evIdx: number) => {
-                        const day = getEventDay(ev.date);
                         return (
                           <div
                             key={ev.id}
@@ -235,9 +284,6 @@ export default function CalendarClientPage({ events }: CalendarClientPageProps) 
                             style={{ animationDelay: `${evIdx * 0.08}s` }}
                           >
                             <span className={styles.pillTitle}>{ev.title}</span>
-                            {day && (
-                              <span className={styles.pillTime} aria-hidden>{day}</span>
-                            )}
                           </div>
                         );
                       })}
